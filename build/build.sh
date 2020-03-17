@@ -161,7 +161,7 @@ CONFIG+=" --with-pkgversion=Compiler-Explorer-Build"
 if [[ ! -z "${PLUGINS}" ]]; then
     CONFIG+=" --enable-plugins=${PLUGINS}"
 fi
-BINUTILS_VERSION=2.29.1
+BINUTILS_VERSION=2.34
 
 applyPatchesAndConfig gcc${MAJOR}
 applyPatchesAndConfig gcc${MAJOR_MINOR}
