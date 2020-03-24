@@ -71,17 +71,16 @@ curl -L -O http://download.savannah.gnu.org/releases/avr-libc/${LIBC_DIR}.tar.bz
 tar xfj ${LIBC_DIR}.tar.bz2
 
 mkdir -p ${LIBC_DIR}/objdir
-pushd ${LIBC_DIR}/objdir 
+pushd ${LIBC_DIR}/objdir
 export PATH=${STAGING_DIR}/bin:$PATH
-../configure --prefix=${STAGING_DIR} --build=`../config.guess` --host=avr
+../configure --prefix=${STAGING_DIR} --build=$(../config.guess) --host=avr
 make -j$(nproc)
 make ${INSTALL_TARGET}
 popd
 
-
 export XZ_DEFAULTS="-T 0"
 tar Jcf ${OUTPUT} --transform "s,^./,./avr-gcc-${VER_GCC}/," -C ${STAGING_DIR} .
 
-if [[ ! -z "${S3OUTPUT}" ]]; then
-    s3cmd put --rr ${OUTPUT} ${S3OUTPUT}
+if [[ -n "${S3OUTPUT}" ]]; then
+    aws s3 cp --storage-class REDUCED_REDUNDANCY "${OUTPUT}" "${S3OUTPUT}"
 fi

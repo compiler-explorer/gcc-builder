@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 MAINTAINER Matt Godbolt <matt@godbolt.org>
 
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt update -y -q && apt upgrade -y -q && apt upgrade -y -q&& apt install -y -q \
+RUN apt update -y -q && apt upgrade -y -q && apt upgrade -y -q && apt install -y -q \
     bison \
     bzip2 \
     curl \
@@ -18,11 +18,16 @@ RUN apt update -y -q && apt upgrade -y -q && apt upgrade -y -q&& apt install -y 
     linux-libc-dev \
     make \
     patch \
-    s3cmd \
     subversion \
     texinfo \
+    unzip \
     wget \
-    xz-utils
+    xz-utils && \
+    cd /tmp && \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm -rf aws*
 
 # We build from a directory that must be at least searchable with
 # EPERM on the CE nodes. Older GCCs erroneously search the $prefix

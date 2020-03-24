@@ -76,7 +76,7 @@ else
 fi
 OUTPUT=/root/gcc-${VERSION}.tar.xz
 S3OUTPUT=""
-if echo $2 | grep s3://; then
+if echo "$2" | grep s3://; then
     S3OUTPUT=$2
 else
     OUTPUT=${2-/root/gcc-${VERSION}.tar.xz}
@@ -86,27 +86,27 @@ fi
 export LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
 STAGING_DIR=$(pwd)/staging
 INSTALL_TARGET=install-strip
-rm -rf ${STAGING_DIR}
-mkdir -p ${STAGING_DIR}
+rm -rf "${STAGING_DIR}"
+mkdir -p "${STAGING_DIR}"
 
-if echo ${URL} | grep svn://; then
-    rm -rf gcc-${VERSION}
-    svn checkout -q ${URL} gcc-${VERSION}
-elif echo ${URL} | grep .git; then
-    rm -rf gcc-${VERSION}
-    git clone -q --depth 1 --single-branch -b "${BRANCH}" ${URL} gcc-${VERSION}
+if echo "${URL}" | grep svn://; then
+    rm -rf "gcc-${VERSION}"
+    svn checkout -q "${URL}" "gcc-${VERSION}"
+elif echo "${URL}" | grep .git; then
+    rm -rf "gcc-${VERSION}"
+    git clone -q --depth 1 --single-branch -b "${BRANCH}" "${URL}" "gcc-${VERSION}"
 else
     if [[ ! -e ${TARBALL} ]]; then
-        echo "Fetching GCC" from ${URL}...
-        curl -L -O ${URL}
+        echo "Fetching GCC from ${URL}..."
+        curl -L -O "${URL}"
     fi
-    rm -rf gcc-${VERSION}
+    rm -rf "gcc-${VERSION}"
     echo "Extracting GCC..."
-    tar axf ${TARBALL}
+    tar axf "${TARBALL}"
 fi
 
 echo "Downloading prerequisites"
-pushd gcc-${VERSION}
+pushd "gcc-${VERSION}"
 if [[ -f ./contrib/download_prerequisites ]]; then
     ./contrib/download_prerequisites
 else
@@ -120,9 +120,9 @@ applyPatchesAndConfig() {
     local PATCH=""
     if [[ -d ${PATCH_DIR} ]]; then
         echo "Applying patches from ${PATCH_DIR}"
-        pushd gcc-${VERSION}
-        for PATCH in ${PATCH_DIR}/*; do
-            patch -p1 <${PATCH}
+        pushd "gcc-${VERSION}"
+        for PATCH in "${PATCH_DIR}"/*; do
+            patch -p1 <"${PATCH}"
         done
         popd
     fi
@@ -131,8 +131,9 @@ applyPatchesAndConfig() {
     local CONFIG_FILE=""
     if [[ -d ${CONFIG_DIR} ]]; then
         echo "Applying config from ${CONFIG_DIR}"
-        for CONFIG_FILE in ${CONFIG_DIR}/*; do
-            . ${CONFIG_FILE}
+        for CONFIG_FILE in "${CONFIG_DIR}"/*; do
+            # shellcheck disable=SC1090
+            . "${CONFIG_FILE}"
         done
     fi
 }
@@ -158,14 +159,14 @@ CONFIG+=" --enable-plugins"
 CONFIG+=" --enable-threads=posix"
 CONFIG+=" --with-pkgversion=Compiler-Explorer-Build"
 # The static analyzer branch adds a --enable-plugins configuration option
-if [[ ! -z "${PLUGINS}" ]]; then
+if [[ -n "${PLUGINS}" ]]; then
     CONFIG+=" --enable-plugins=${PLUGINS}"
 fi
 BINUTILS_VERSION=2.34
 
-applyPatchesAndConfig gcc${MAJOR}
-applyPatchesAndConfig gcc${MAJOR_MINOR}
-applyPatchesAndConfig gcc${VERSION}
+applyPatchesAndConfig "gcc${MAJOR}"
+applyPatchesAndConfig "gcc${MAJOR_MINOR}"
+applyPatchesAndConfig "gcc${VERSION}"
 
 echo "Will configure with ${CONFIG}"
 
@@ -181,22 +182,24 @@ else
     tar jxf binutils-${BINUTILS_VERSION}.tar.bz2
     mkdir ${BINUTILS_DIR}/objdir
     pushd ${BINUTILS_DIR}/objdir
-    ../configure --prefix=${STAGING_DIR} ${CONFIG}
-    make -j$(nproc)
+    # shellcheck disable=SC2086
+    ../configure --prefix="${STAGING_DIR}" ${CONFIG}
+    make "-j$(nproc)"
     make ${INSTALL_TARGET}
     popd
 fi
 
 mkdir -p objdir
 pushd objdir
-../gcc-${VERSION}/configure --prefix=${STAGING_DIR} ${CONFIG}
-make -j$(nproc)
+# shellcheck disable=SC2086
+"../gcc-${VERSION}/configure" --prefix="${STAGING_DIR}" ${CONFIG}
+make "-j$(nproc)"
 make ${INSTALL_TARGET}
 popd
 
 export XZ_DEFAULTS="-T 0"
-tar Jcf ${OUTPUT} --transform "s,^./,./gcc-${VERSION}/," -C ${STAGING_DIR} .
+tar Jcf "${OUTPUT}" --transform "s,^./,./gcc-${VERSION}/," -C "${STAGING_DIR}" .
 
-if [[ ! -z "${S3OUTPUT}" ]]; then
-    s3cmd put --rr ${OUTPUT} ${S3OUTPUT}
+if [[ -n "${S3OUTPUT}" ]]; then
+    aws s3 cp --storage-class REDUCED_REDUNDANCY "${OUTPUT}" "${S3OUTPUT}"
 fi

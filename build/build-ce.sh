@@ -43,6 +43,6 @@ bash ${SOURCE_DIR}/build.sh --prefix=${STAGING_DIR} -j $(nproc)
 export XZ_DEFAULTS="-T 0"
 tar Jcf ${OUTPUT} --transform "s,^./,./gcc-ce-${VERSION}/," -C ${STAGING_DIR} .
 
-if [[ ! -z "${S3OUTPUT}" ]]; then
-    s3cmd put --rr ${OUTPUT} ${S3OUTPUT}
+if [[ -n "${S3OUTPUT}" ]]; then
+    aws s3 cp --storage-class REDUCED_REDUNDANCY "${OUTPUT}" "${S3OUTPUT}"
 fi
