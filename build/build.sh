@@ -6,6 +6,7 @@ ROOT=$(pwd)
 VERSION=$1
 LANGUAGES=c,c++,fortran,ada
 PLUGINS=
+BINUTILS_VERSION=2.34
 if echo "${VERSION}" | grep 'embed-trunk'; then
     VERSION=embed-trunk-$(date +%Y%m%d)
     URL=https://github.com/ThePhD/gcc.git
@@ -49,6 +50,7 @@ elif echo "${VERSION}" | grep 'trunk'; then
     MAJOR=10
     MAJOR_MINOR=10-trunk
     LANGUAGES=${LANGUAGES},d
+    BINUTILS_VERSION=trunk
 elif echo "${VERSION}" | grep 'snapshot-'; then
     VERSION=${VERSION/#snapshot-/}
     TARBALL=gcc-${VERSION}.tar.xz
@@ -162,7 +164,6 @@ CONFIG+=" --with-pkgversion=Compiler-Explorer-Build"
 if [[ -n "${PLUGINS}" ]]; then
     CONFIG+=" --enable-plugins=${PLUGINS}"
 fi
-BINUTILS_VERSION=2.34
 
 applyPatchesAndConfig "gcc${MAJOR}"
 applyPatchesAndConfig "gcc${MAJOR_MINOR}"
@@ -173,13 +174,18 @@ echo "Will configure with ${CONFIG}"
 if [[ -z "${BINUTILS_VERSION}" ]]; then
     echo "Using host binutils $(ld -v)"
 else
-    echo "Fetching binutils ${BINUTILS_VERSION}"
-    if [[ ! -e binutils-${BINUTILS_VERSION}.tar.bz2 ]]; then
-        curl -L -O http://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION}.tar.bz2
-    fi
     BINUTILS_DIR=binutils-${BINUTILS_VERSION}
     rm -rf ${BINUTILS_DIR}
-    tar jxf binutils-${BINUTILS_VERSION}.tar.bz2
+
+    if [[ "${BINUTILS_VERSION}" == "trunk" ]]; then
+        git clone --depth=1 https://sourceware.org/git/binutils-gdb.git ${BINUTILS_DIR}
+    else
+        echo "Fetching binutils ${BINUTILS_VERSION}"
+        if [[ ! -e binutils-${BINUTILS_VERSION}.tar.bz2 ]]; then
+            curl -L -O http://ftp.gnu.org/gnu/binutils/binutils-${BINUTILS_VERSION}.tar.bz2
+        fi
+        tar jxf binutils-${BINUTILS_VERSION}.tar.bz2
+    fi
     mkdir ${BINUTILS_DIR}/objdir
     pushd ${BINUTILS_DIR}/objdir
     # shellcheck disable=SC2086
