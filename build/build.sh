@@ -51,30 +51,12 @@ elif echo "${VERSION}" | grep 'trunk'; then
     MAJOR_MINOR=10-trunk
     LANGUAGES=${LANGUAGES},d
     BINUTILS_VERSION=trunk
-elif echo "${VERSION}" | grep 'snapshot-'; then
-    VERSION=${VERSION/#snapshot-/}
-    TARBALL=gcc-${VERSION}.tar.xz
-    URL=ftp://gcc.gnu.org/pub/gcc/snapshots/${VERSION}/${TARBALL}
-    MAJOR=$(echo "${VERSION}" | grep -oE '^[0-9]+')
-    MAJOR_MINOR=${MAJOR}-snapshot
-    LANGUAGES=${LANGUAGES},d
 else
     MAJOR=$(echo "${VERSION}" | grep -oE '^[0-9]+')
     MAJOR_MINOR=$(echo "${VERSION}" | grep -oE '^[0-9]+\.[0-9]+')
     MINOR=$(echo "${MAJOR_MINOR}" | cut -d. -f2)
-    TARBALL=gcc-${VERSION}.tar.bz2
-    if [[ "${MAJOR}" -ge 9 ]]; then LANGUAGES=${LANGUAGES},d; fi
-    if [[ "${MAJOR}" -ge 8 ]]; then TARBALL=gcc-${VERSION}.tar.xz; fi
-    if [[ "${MAJOR}" -eq 7 ]]; then
-        if [[ "${MINOR}" -ge 2 ]]; then TARBALL=gcc-${VERSION}.tar.xz; fi
-    fi
-    if [[ "${MAJOR}" -eq 6 ]]; then
-        if [[ "${MINOR}" -ge 4 ]]; then TARBALL=gcc-${VERSION}.tar.xz; fi
-    fi
-    if [[ "${MAJOR}" -eq 5 ]]; then
-        if [[ "${MINOR}" -ge 5 ]]; then TARBALL=gcc-${VERSION}.tar.xz; fi
-    fi
-    URL=ftp://ftp.gnu.org/gnu/gcc/gcc-${VERSION}/${TARBALL}
+    URL=git://gcc.gnu.org/git/gcc.git
+    BRANCH=releases/gcc-${VERSION}
 fi
 OUTPUT=/root/gcc-${VERSION}.tar.xz
 S3OUTPUT=""
@@ -91,21 +73,8 @@ INSTALL_TARGET=install-strip
 rm -rf "${STAGING_DIR}"
 mkdir -p "${STAGING_DIR}"
 
-if echo "${URL}" | grep svn://; then
-    rm -rf "gcc-${VERSION}"
-    svn checkout -q "${URL}" "gcc-${VERSION}"
-elif echo "${URL}" | grep .git; then
-    rm -rf "gcc-${VERSION}"
-    git clone -q --depth 1 --single-branch -b "${BRANCH}" "${URL}" "gcc-${VERSION}"
-else
-    if [[ ! -e ${TARBALL} ]]; then
-        echo "Fetching GCC from ${URL}..."
-        curl -L -O "${URL}"
-    fi
-    rm -rf "gcc-${VERSION}"
-    echo "Extracting GCC..."
-    tar axf "${TARBALL}"
-fi
+rm -rf "gcc-${VERSION}"
+git clone -q --depth 1 --single-branch -b "${BRANCH}" "${URL}" "gcc-${VERSION}"
 
 echo "Downloading prerequisites"
 pushd "gcc-${VERSION}"
