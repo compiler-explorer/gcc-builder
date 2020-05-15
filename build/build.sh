@@ -6,7 +6,9 @@ ROOT=$(pwd)
 VERSION=$1
 LANGUAGES=c,c++,fortran,ada
 PLUGINS=
+BINUTILS_GITURL=https://sourceware.org/git/binutils-gdb.git
 BINUTILS_VERSION=2.34
+BINUTILS_REVISION=$BINUTILS_VERSION
 if echo "${VERSION}" | grep 'embed-trunk'; then
     VERSION=embed-trunk-$(date +%Y%m%d)
     URL=https://github.com/ThePhD/gcc.git
@@ -67,20 +69,19 @@ else
     OUTPUT=${2-/root/gcc-${VERSION}.tar.xz}
 fi
 
-if [[ $BINUTILS_VERSION = "trunk" ]]; then
-  BINUTILSREV="$(git ls-remote --heads https://sourceware.org/git/binutils-gdb.git refs/heads/master | cut -f 1)"
-else
-  BINUTILSREV=$BINUTILS_VERSION
+if [[ "${BINUTILS_VERSION}" == "trunk" ]]; then
+  BINUTILS_REVISION="$(git ls-remote --heads ${BINUTILS_GITURL} refs/heads/master | cut -f 1)"
 fi
 
-NEWCEREV="$(git ls-remote --heads ${URL} refs/heads/${BRANCH} | cut -f 1) ++ ${BINUTILSREV}"
-GIVCEREV="${3}"
+GCC_REVISION=$(git ls-remote --heads ${URL} refs/heads/${BRANCH} | cut -f 1)
+REVISION="gcc-${GCC_REVISION}-binutils-${BINUTILS_REVISION}"
+LAST_REVISION="${3}"
 
-if [[ "${GIVCEREV}" = ${NEWCEREV} ]]; then
-  echo "ce-build-revision:${NEWCEREV}"
+echo "ce-build-revision:${REVISION}"
+
+if [[ "${REVISION}" == "${LAST_REVISION}" ]]; then
+  echo "ce-build-status:SKIPPED"
   exit
-else
-  echo "revs dont match, going to build"
 fi
 
 # Workaround for Ubuntu builds
@@ -164,7 +165,7 @@ else
     rm -rf ${BINUTILS_DIR}
 
     if [[ "${BINUTILS_VERSION}" == "trunk" ]]; then
-        git clone --depth=1 https://sourceware.org/git/binutils-gdb.git ${BINUTILS_DIR}
+        git clone --depth=1 ${BINUTILS_GITURL} ${BINUTILS_DIR}
     else
         echo "Fetching binutils ${BINUTILS_VERSION}"
         if [[ ! -e binutils-${BINUTILS_VERSION}.tar.bz2 ]]; then
@@ -195,5 +196,3 @@ tar Jcf "${OUTPUT}" --transform "s,^./,./gcc-${VERSION}/," -C "${STAGING_DIR}" .
 if [[ -n "${S3OUTPUT}" ]]; then
     aws s3 cp --storage-class REDUCED_REDUNDANCY "${OUTPUT}" "${S3OUTPUT}"
 fi
-
-echo "ce-build-revision:${NEWCEREV}"
