@@ -67,6 +67,22 @@ else
     OUTPUT=${2-/root/gcc-${VERSION}.tar.xz}
 fi
 
+if [[ $BINUTILS_VERSION = "trunk" ]]; then
+  BINUTILSREV="$(git ls-remote --heads https://sourceware.org/git/binutils-gdb.git heads/master | cut -f 1)"
+else
+  BINUTILSREV=$BINUTILS_VERSION
+fi
+
+NEWCEREV="$(git ls-remote --heads ${URL} ${BRANCH} | cut -f 1) ++ ${BINUTILSREV}"
+GIVCEREV="${3}"
+
+if [[ "${GIVCEREV}" = ${NEWCEREV} ]]; then
+  echo "ce-build-revision:${NEWCEREV}"
+  exit
+else
+  echo "revs dont match, going to build"
+fi
+
 # Workaround for Ubuntu builds
 export LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
 STAGING_DIR=$(pwd)/staging
@@ -179,3 +195,5 @@ tar Jcf "${OUTPUT}" --transform "s,^./,./gcc-${VERSION}/," -C "${STAGING_DIR}" .
 if [[ -n "${S3OUTPUT}" ]]; then
     aws s3 cp --storage-class REDUCED_REDUNDANCY "${OUTPUT}" "${S3OUTPUT}"
 fi
+
+echo "ce-build-revision:${NEWCEREV}"
