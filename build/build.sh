@@ -68,12 +68,12 @@ else
 fi
 
 if [[ $BINUTILS_VERSION = "trunk" ]]; then
-  BINUTILSREV="$(git ls-remote --heads https://sourceware.org/git/binutils-gdb.git heads/master | cut -f 1)"
+  BINUTILSREV="$(git ls-remote --heads https://sourceware.org/git/binutils-gdb.git refs/heads/master | cut -f 1)"
 else
   BINUTILSREV=$BINUTILS_VERSION
 fi
 
-NEWCEREV="$(git ls-remote --heads ${URL} ${BRANCH} | cut -f 1) ++ ${BINUTILSREV}"
+NEWCEREV="$(git ls-remote --heads ${URL} refs/heads/${BRANCH} | cut -f 1) ++ ${BINUTILSREV}"
 GIVCEREV="${3}"
 
 if [[ "${GIVCEREV}" = ${NEWCEREV} ]]; then
