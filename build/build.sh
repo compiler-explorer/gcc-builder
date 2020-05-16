@@ -6,7 +6,9 @@ ROOT=$(pwd)
 VERSION=$1
 LANGUAGES=c,c++,fortran,ada
 PLUGINS=
+BINUTILS_GITURL=https://sourceware.org/git/binutils-gdb.git
 BINUTILS_VERSION=2.34
+BINUTILS_REVISION=$BINUTILS_VERSION
 if echo "${VERSION}" | grep 'embed-trunk'; then
     VERSION=embed-trunk-$(date +%Y%m%d)
     URL=https://github.com/ThePhD/gcc.git
@@ -65,6 +67,21 @@ if echo "$2" | grep s3://; then
     S3OUTPUT=$2
 else
     OUTPUT=${2-/root/gcc-${VERSION}.tar.xz}
+fi
+
+if [[ "${BINUTILS_VERSION}" == "trunk" ]]; then
+  BINUTILS_REVISION="$(git ls-remote --heads ${BINUTILS_GITURL} refs/heads/master | cut -f 1)"
+fi
+
+GCC_REVISION=$(git ls-remote --heads ${URL} refs/heads/${BRANCH} | cut -f 1)
+REVISION="gcc-${GCC_REVISION}-binutils-${BINUTILS_REVISION}"
+LAST_REVISION="${3}"
+
+echo "ce-build-revision:${REVISION}"
+
+if [[ "${REVISION}" == "${LAST_REVISION}" ]]; then
+  echo "ce-build-status:SKIPPED"
+  exit
 fi
 
 # Workaround for Ubuntu builds
@@ -148,7 +165,7 @@ else
     rm -rf ${BINUTILS_DIR}
 
     if [[ "${BINUTILS_VERSION}" == "trunk" ]]; then
-        git clone --depth=1 https://sourceware.org/git/binutils-gdb.git ${BINUTILS_DIR}
+        git clone --depth=1 ${BINUTILS_GITURL} ${BINUTILS_DIR}
     else
         echo "Fetching binutils ${BINUTILS_VERSION}"
         if [[ ! -e binutils-${BINUTILS_VERSION}.tar.bz2 ]]; then
