@@ -59,6 +59,7 @@ else
     MINOR=$(echo "${MAJOR_MINOR}" | cut -d. -f2)
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=releases/gcc-${VERSION}
+    if [[ "${MAJOR}" -gt 4 ]] || [[ "${MAJOR}" -eq 4 && "${MINOR}" -ge 7 ]]; then LANGUAGES=${LANGUAGES},go; fi
     if [[ "${MAJOR}" -ge 9 ]]; then LANGUAGES=${LANGUAGES},d; fi
 fi
 OUTPUT=/root/gcc-${VERSION}.tar.xz
