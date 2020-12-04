@@ -70,8 +70,10 @@ else
     OUTPUT=${2-/root/gcc-${VERSION}.tar.xz}
 fi
 
+BINUTILS_NEEDS_GMP=
 if [[ "${BINUTILS_VERSION}" == "trunk" ]]; then
-  BINUTILS_REVISION="$(git ls-remote --heads ${BINUTILS_GITURL} refs/heads/master | cut -f 1)"
+    BINUTILS_REVISION="$(git ls-remote --heads ${BINUTILS_GITURL} refs/heads/master | cut -f 1)"
+    BINUTILS_NEEDS_GMP=yes
 fi
 
 GCC_REVISION=$(git ls-remote --heads ${URL} refs/heads/${BRANCH} | cut -f 1)
@@ -81,8 +83,8 @@ LAST_REVISION="${3}"
 echo "ce-build-revision:${REVISION}"
 
 if [[ "${REVISION}" == "${LAST_REVISION}" ]]; then
-  echo "ce-build-status:SKIPPED"
-  exit
+    echo "ce-build-status:SKIPPED"
+    exit
 fi
 
 # Workaround for Ubuntu builds
@@ -176,8 +178,22 @@ else
     fi
     mkdir ${BINUTILS_DIR}/objdir
     pushd ${BINUTILS_DIR}/objdir
+
+    EXTRA_CONFIG_ARGS=
+    GMP_DIR=../../gcc-${VERSION}/gmp
+    if [[ -n "${BINUTILS_NEEDS_GMP}" ]]; then
+        echo "Building GMP for binutils"
+        pushd "${GMP_DIR}"
+        # shellcheck disable=SC2086
+        ./configure --prefix="${STAGING_DIR}" ${CONFIG}
+        make -j"$(nproc)" install
+        make distclean
+        popd
+        EXTRA_CONFIG_ARGS=--with-gmp="${STAGING_DIR}"
+    fi
+
     # shellcheck disable=SC2086
-    ../configure --prefix="${STAGING_DIR}" ${CONFIG}
+    ../configure --prefix="${STAGING_DIR}" ${CONFIG} ${EXTRA_CONFIG_ARGS}
     make "-j$(nproc)"
     make ${INSTALL_TARGET}
     popd
