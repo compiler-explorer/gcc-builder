@@ -52,7 +52,7 @@ elif echo "${VERSION}" | grep 'trunk'; then
     MAJOR=10
     MAJOR_MINOR=10-trunk
     LANGUAGES=${LANGUAGES},d
-    BINUTILS_VERSION=trunk
+    BINUTILS_VERSION=2.35.1
 else
     MAJOR=$(echo "${VERSION}" | grep -oE '^[0-9]+')
     MAJOR_MINOR=$(echo "${VERSION}" | grep -oE '^[0-9]+\.[0-9]+')
