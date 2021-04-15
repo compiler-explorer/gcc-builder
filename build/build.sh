@@ -18,7 +18,7 @@ if echo "${VERSION}" | grep 'embed-trunk'; then
     LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'lock3-contracts-trunk'; then
     VERSION=lock3-contracts-trunk-$(date +%Y%m%d)
-    URL=https://gitlab.com/lock3/gcc-new.git/
+    URL=https://github.com/lock3/gcc.git
     BRANCH=contracts
     MAJOR=10
     MAJOR_MINOR=10-trunk
