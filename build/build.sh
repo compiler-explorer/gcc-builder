@@ -23,6 +23,13 @@ elif echo "${VERSION}" | grep 'lock3-contracts-trunk'; then
     MAJOR=10
     MAJOR_MINOR=10-trunk
     LANGUAGES=c,c++
+elif echo "${VERSION}" | grep 'lock3-contract-labels-trunk'; then
+    VERSION=lock3-contract-labels-trunk-$(date +%Y%m%d)
+    URL=https://github.com/lock3/gcc.git
+    BRANCH=contract-labels
+    MAJOR=10
+    MAJOR_MINOR=10-trunk
+    LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'cxx-modules-trunk'; then
     VERSION=cxx-modules-trunk-$(date +%Y%m%d)
     URL=git://gcc.gnu.org/git/gcc.git
