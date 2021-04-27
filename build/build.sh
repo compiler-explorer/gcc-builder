@@ -7,7 +7,7 @@ VERSION=$1
 LANGUAGES=c,c++,fortran,ada
 PLUGINS=
 BINUTILS_GITURL=https://sourceware.org/git/binutils-gdb.git
-BINUTILS_VERSION=2.34
+BINUTILS_VERSION=2.36.1
 BINUTILS_REVISION=$BINUTILS_VERSION
 if echo "${VERSION}" | grep 'embed-trunk'; then
     VERSION=embed-trunk-$(date +%Y%m%d)
