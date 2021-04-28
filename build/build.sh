@@ -52,6 +52,13 @@ elif echo "${VERSION}" | grep 'static-analysis-trunk'; then
     MAJOR_MINOR=10-trunk
     LANGUAGES=c,c++
     PLUGINS=analyzer
+elif echo "${VERSION}" | grep 'gccrs-master'; then
+    VERSION=gccrs-master-$(date +%Y%m%d)
+    URL=https://github.com/Rust-GCC/gccrs.git
+    BRANCH=master
+    MAJOR=10
+    MAJOR_MINOR=10-trunk
+    LANGUAGES=rust
 elif echo "${VERSION}" | grep 'trunk'; then
     VERSION=trunk-$(date +%Y%m%d)
     URL=git://gcc.gnu.org/git/gcc.git
