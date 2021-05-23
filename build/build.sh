@@ -56,8 +56,8 @@ elif echo "${VERSION}" | grep 'gccrs-master'; then
     VERSION=gccrs-master-$(date +%Y%m%d)
     URL=https://github.com/Rust-GCC/gccrs.git
     BRANCH=master
-    MAJOR=10
-    MAJOR_MINOR=10-trunk
+    MAJOR=11
+    MAJOR_MINOR=11-trunk
     LANGUAGES=rust
 elif echo "${VERSION}" | grep 'trunk'; then
     VERSION=trunk-$(date +%Y%m%d)
@@ -90,9 +90,11 @@ if [[ "${BINUTILS_VERSION}" == "trunk" ]]; then
     BINUTILS_NEEDS_GMP=yes
 fi
 
-GCC_REVISION=$(git ls-remote --heads ${URL} refs/heads/${BRANCH} | cut -f 1)
+GCC_REVISION=$(git ls-remote --heads ${URL} "refs/heads/${BRANCH}" | cut -f 1)
 REVISION="gcc-${GCC_REVISION}-binutils-${BINUTILS_REVISION}"
 LAST_REVISION="${3}"
+
+PKGVERSION="Compiler-Explorer-Build-${REVISION}"
 
 echo "ce-build-revision:${REVISION}"
 
@@ -163,7 +165,7 @@ CONFIG+=" --enable-linker-build-id"
 CONFIG+=" --enable-lto"
 CONFIG+=" --enable-plugins"
 CONFIG+=" --enable-threads=posix"
-CONFIG+=" --with-pkgversion=Compiler-Explorer-Build"
+CONFIG+=" --with-pkgversion=\"${PKGVERSION}\""
 # The static analyzer branch adds a --enable-plugins configuration option
 if [[ -n "${PLUGINS}" ]]; then
     CONFIG+=" --enable-plugins=${PLUGINS}"
