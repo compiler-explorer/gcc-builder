@@ -4,7 +4,7 @@ set -ex
 
 ROOT=$(pwd)
 VERSION=$1
-LANGUAGES=c,c++,fortran
+LANGUAGES=c,c++,fortran,ada
 PLUGINS=
 BINUTILS_GITURL=https://sourceware.org/git/binutils-gdb.git
 BINUTILS_VERSION=2.36.1
