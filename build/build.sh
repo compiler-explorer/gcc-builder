@@ -76,12 +76,17 @@ else
     if [[ "${MAJOR}" -gt 4 ]] || [[ "${MAJOR}" -eq 4 && "${MINOR}" -ge 7 ]]; then LANGUAGES=${LANGUAGES},go; fi
     if [[ "${MAJOR}" -ge 9 ]]; then LANGUAGES=${LANGUAGES},d; fi
 fi
-OUTPUT=/root/gcc-${VERSION}.tar.xz
+FULLNAME=gcc-${VERSION}
+OUTPUT=${ROOT}/${FULNAME}.tar.xz
 S3OUTPUT=""
 if echo "$2" | grep s3://; then
     S3OUTPUT=$2
 else
-    OUTPUT=${2-/root/gcc-${VERSION}.tar.xz}
+    if [[ -d "${2}" ]]; then
+        OUTPUT=$2/${FULLNAME}.tar.xz
+    else
+        OUTPUT=${2-$OUTPUT}
+    fi
 fi
 
 BINUTILS_NEEDS_GMP=
@@ -97,6 +102,7 @@ LAST_REVISION="${3}"
 PKGVERSION="Compiler-Explorer-Build-${REVISION}"
 
 echo "ce-build-revision:${REVISION}"
+echo "ce-build-output:${OUTPUT}"
 
 if [[ "${REVISION}" == "${LAST_REVISION}" ]]; then
     echo "ce-build-status:SKIPPED"
