@@ -77,7 +77,7 @@ else
     if [[ "${MAJOR}" -ge 9 ]]; then LANGUAGES=${LANGUAGES},d; fi
 fi
 FULLNAME=gcc-${VERSION}
-OUTPUT=${ROOT}/${FULNAME}.tar.xz
+OUTPUT=${ROOT}/${FULLNAME}.tar.xz
 S3OUTPUT=""
 if echo "$2" | grep s3://; then
     S3OUTPUT=$2
