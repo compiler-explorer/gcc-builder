@@ -235,3 +235,5 @@ tar Jcf "${OUTPUT}" --transform "s,^./,./gcc-${VERSION}/," -C "${STAGING_DIR}" .
 if [[ -n "${S3OUTPUT}" ]]; then
     aws s3 cp --storage-class REDUCED_REDUNDANCY "${OUTPUT}" "${S3OUTPUT}"
 fi
+
+echo "ce-build-status:OK"
