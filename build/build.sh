@@ -7,7 +7,7 @@ VERSION=$1
 LANGUAGES=c,c++,fortran,ada
 PLUGINS=
 BINUTILS_GITURL=https://sourceware.org/git/binutils-gdb.git
-BINUTILS_VERSION=2.36.1
+BINUTILS_VERSION=2.38
 BINUTILS_REVISION=$BINUTILS_VERSION
 if echo "${VERSION}" | grep 'embed-trunk'; then
     VERSION=embed-trunk-$(date +%Y%m%d)
@@ -66,7 +66,6 @@ elif echo "${VERSION}" | grep 'trunk'; then
     MAJOR=10
     MAJOR_MINOR=10-trunk
     LANGUAGES=${LANGUAGES},d
-    BINUTILS_VERSION=2.35.1
 else
     MAJOR=$(echo "${VERSION}" | grep -oE '^[0-9]+')
     MAJOR_MINOR=$(echo "${VERSION}" | grep -oE '^[0-9]+\.[0-9]+')
