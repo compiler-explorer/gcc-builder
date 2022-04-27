@@ -63,8 +63,8 @@ elif echo "${VERSION}" | grep 'trunk'; then
     VERSION=trunk-$(date +%Y%m%d)
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
-    MAJOR=10
-    MAJOR_MINOR=10-trunk
+    MAJOR=12
+    MAJOR_MINOR=12-trunk
     LANGUAGES=${LANGUAGES},d
 else
     MAJOR=$(echo "${VERSION}" | grep -oE '^[0-9]+')
