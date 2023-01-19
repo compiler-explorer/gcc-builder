@@ -56,16 +56,17 @@ elif echo "${VERSION}" | grep 'gccrs-master'; then
     VERSION=gccrs-master-$(date +%Y%m%d)
     URL=https://github.com/Rust-GCC/gccrs.git
     BRANCH=master
-    MAJOR=11
+    MAJOR=13
     MAJOR_MINOR=11-trunk
+    # Only rust, this is intentional.
     LANGUAGES=rust
 elif echo "${VERSION}" | grep 'trunk'; then
     VERSION=trunk-$(date +%Y%m%d)
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
-    MAJOR=12
+    MAJOR=13
     MAJOR_MINOR=12-trunk
-    LANGUAGES=${LANGUAGES},d
+    LANGUAGES="${LANGUAGES},go,d,rust"
 else
     MAJOR=$(echo "${VERSION}" | grep -oE '^[0-9]+')
     MAJOR_MINOR=$(echo "${VERSION}" | grep -oE '^[0-9]+\.[0-9]+')
@@ -74,6 +75,8 @@ else
     BRANCH=releases/gcc-${VERSION}
     if [[ "${MAJOR}" -gt 4 ]] || [[ "${MAJOR}" -eq 4 && "${MINOR}" -ge 7 ]]; then LANGUAGES=${LANGUAGES},go; fi
     if [[ "${MAJOR}" -ge 9 ]]; then LANGUAGES=${LANGUAGES},d; fi
+    # getting ready for next release.
+    if [[ "${MAJOR}" -ge 13 ]]; then LANGUAGES=${LANGUAGES},rust; fi
 fi
 FULLNAME=gcc-${VERSION}
 OUTPUT=${ROOT}/${FULLNAME}.tar.xz
