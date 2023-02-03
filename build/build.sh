@@ -66,7 +66,7 @@ elif echo "${VERSION}" | grep 'trunk'; then
     BRANCH=master
     MAJOR=13
     MAJOR_MINOR=12-trunk
-    LANGUAGES="${LANGUAGES},go,d,rust"
+    LANGUAGES="${LANGUAGES},go,d,rust,m2"
 else
     MAJOR=$(echo "${VERSION}" | grep -oE '^[0-9]+')
     MAJOR_MINOR=$(echo "${VERSION}" | grep -oE '^[0-9]+\.[0-9]+')
@@ -76,7 +76,7 @@ else
     if [[ "${MAJOR}" -gt 4 ]] || [[ "${MAJOR}" -eq 4 && "${MINOR}" -ge 7 ]]; then LANGUAGES=${LANGUAGES},go; fi
     if [[ "${MAJOR}" -ge 9 ]]; then LANGUAGES=${LANGUAGES},d; fi
     # getting ready for next release.
-    if [[ "${MAJOR}" -ge 13 ]]; then LANGUAGES=${LANGUAGES},rust; fi
+    if [[ "${MAJOR}" -ge 13 ]]; then LANGUAGES=${LANGUAGES},rust,m2; fi
 fi
 FULLNAME=gcc-${VERSION}
 OUTPUT=${ROOT}/${FULLNAME}.tar.xz
