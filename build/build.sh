@@ -9,6 +9,7 @@ PLUGINS=
 BINUTILS_GITURL=https://sourceware.org/git/binutils-gdb.git
 BINUTILS_VERSION=2.38
 BINUTILS_REVISION=$BINUTILS_VERSION
+CONFIG=""
 if echo "${VERSION}" | grep 'embed-trunk'; then
     VERSION=embed-trunk-$(date +%Y%m%d)
     URL=https://github.com/ThePhD/gcc.git
@@ -60,6 +61,7 @@ elif echo "${VERSION}" | grep 'gccrs-master'; then
     MAJOR_MINOR=11-trunk
     # Only rust, this is intentional.
     LANGUAGES=rust
+    CONFIG+=" --enable-libstdcxx-backtrace=yes"
 elif echo "${VERSION}" | grep 'trunk'; then
     VERSION=trunk-$(date +%Y%m%d)
     URL=git://gcc.gnu.org/git/gcc.git
@@ -67,6 +69,7 @@ elif echo "${VERSION}" | grep 'trunk'; then
     MAJOR=13
     MAJOR_MINOR=12-trunk
     LANGUAGES="${LANGUAGES},go,d,rust,m2"
+    CONFIG+=" --enable-libstdcxx-backtrace=yes"
 else
     MAJOR=$(echo "${VERSION}" | grep -oE '^[0-9]+')
     MAJOR_MINOR=$(echo "${VERSION}" | grep -oE '^[0-9]+\.[0-9]+')
@@ -154,7 +157,6 @@ applyPatchesAndConfig() {
     fi
 }
 
-CONFIG=""
 CONFIG+=" --build=x86_64-linux-gnu"
 CONFIG+=" --host=x86_64-linux-gnu"
 CONFIG+=" --target=x86_64-linux-gnu"
@@ -169,7 +171,6 @@ CONFIG+=" --enable-ld=yes"
 CONFIG+=" --enable-gold=yes"
 CONFIG+=" --enable-libstdcxx-debug"
 CONFIG+=" --enable-libstdcxx-time=yes"
-CONFIG+=" --enable-libstdcxx-backtrace=yes"
 CONFIG+=" --enable-linker-build-id"
 CONFIG+=" --enable-lto"
 CONFIG+=" --enable-plugins"
