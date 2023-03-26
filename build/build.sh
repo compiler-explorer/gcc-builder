@@ -65,6 +65,7 @@ elif echo "${VERSION}" | grep 'gccrs-master'; then
     LANGUAGES=rust
 elif echo "${VERSION}" | grep 'cobol-master'; then
     VERSION=cobol-master-$(date +%Y%m%d)
+    PATCH_VERSION=cobol-master
     URL=https://gitlab.cobolworx.com/COBOLworx/gcc-cobol.git
     BRANCH="master+cobol"
     MAJOR=13
@@ -193,7 +194,7 @@ fi
 
 applyPatchesAndConfig "gcc${MAJOR}"
 applyPatchesAndConfig "gcc${MAJOR_MINOR}"
-applyPatchesAndConfig "gcc${VERSION}"
+applyPatchesAndConfig "gcc${PATCH_VERSION:-$VERSION}"
 
 echo "Will configure with ${CONFIG}"
 
