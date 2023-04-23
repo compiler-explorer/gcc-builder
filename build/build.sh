@@ -90,7 +90,7 @@ else
     if [[ "${MAJOR}" -gt 4 ]] || [[ "${MAJOR}" -eq 4 && "${MINOR}" -ge 7 ]]; then LANGUAGES=${LANGUAGES},go; fi
     if [[ "${MAJOR}" -ge 9 ]]; then LANGUAGES=${LANGUAGES},d; fi
     # getting ready for next release.
-    if [[ "${MAJOR}" -ge 13 ]]; then LANGUAGES=${LANGUAGES},rust,m2; fi
+    if [[ "${MAJOR}" -ge 13 ]]; then LANGUAGES=${LANGUAGES},m2; fi
 fi
 FULLNAME=gcc-${VERSION}
 OUTPUT=${ROOT}/${FULLNAME}.tar.xz
