@@ -72,7 +72,8 @@ elif echo "${VERSION}" | grep 'cobol-master'; then
     MAJOR_MINOR=13-trunk
     # Currently fails to build 32-bit multilibs
     MULTILIB_ENABLED=" --disable-multilib"
-    LANGUAGES=cobol
+    ## implicit dep on C++ as libgcobol uses libstdc++.
+    LANGUAGES=cobol,c++
 elif echo "${VERSION}" | grep 'trunk'; then
     VERSION=trunk-$(date +%Y%m%d)
     URL=git://gcc.gnu.org/git/gcc.git
