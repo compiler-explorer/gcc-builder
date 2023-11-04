@@ -33,6 +33,13 @@ elif echo "${VERSION}" | grep 'lock3-contract-labels-trunk'; then
     MAJOR=10
     MAJOR_MINOR=10-trunk
     LANGUAGES=c,c++
+elif echo "${VERSION}" | grep 'contracts-nonattr'; then
+    VERSION=contracts-nonattr-trunk-$(date +%Y%m%d)
+    URL=https://github.com/villevoutilainen/gcc.git
+    BRANCH=contracts-nonattr
+    MAJOR=13
+    MAJOR_MINOR=13-trunk
+    LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'cxx-modules-trunk'; then
     VERSION=cxx-modules-trunk-$(date +%Y%m%d)
     URL=git://gcc.gnu.org/git/gcc.git
