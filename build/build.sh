@@ -40,6 +40,13 @@ elif echo "${VERSION}" | grep 'contracts-nonattr'; then
     MAJOR=13
     MAJOR_MINOR=13-trunk
     LANGUAGES=c,c++
+elif echo "${VERSION}" | grep 'p1144-trunk'; then
+    VERSION=p1144-trunk-$(date +%Y%m%d)
+    URL=https://github.com/Quuxplusone/gcc.git
+    BRANCH=trivially-relocatable
+    MAJOR=13
+    MAJOR_MINOR=13-trunk
+    LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'cxx-modules-trunk'; then
     VERSION=cxx-modules-trunk-$(date +%Y%m%d)
     URL=git://gcc.gnu.org/git/gcc.git
