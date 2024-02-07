@@ -105,7 +105,7 @@ else
     if [[ "${MAJOR}" -gt 4 ]] || [[ "${MAJOR}" -eq 4 && "${MINOR}" -ge 7 ]]; then LANGUAGES=${LANGUAGES},go; fi
     if [[ "${MAJOR}" -ge 9 ]]; then LANGUAGES=${LANGUAGES},d; fi
 
-    # New for this explicit flag for enabling <backtrace> support.
+    # Need this explicit flag for enabling <backtrace> support.
     # See https://github.com/compiler-explorer/compiler-explorer/issues/6103
     if [[ "${MAJOR}" -ge 12 ]]; then CONFIG+=" --enable-libstdcxx-backtrace=yes"; fi
 
