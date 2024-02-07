@@ -1,1 +1,0 @@
-CONFIG+=" --enable-libstdcxx-backtrace=yes"
