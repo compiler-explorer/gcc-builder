@@ -30,6 +30,9 @@ RUN apt update -y -q && apt upgrade -y -q && apt upgrade -y -q && apt install -y
     ./aws/install && \
     rm -rf aws*
 
+## The Rust frontend now requires rustc to build.
+RUN curl  --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s - -y
+
 # We build from a directory that must be at least searchable with
 # EPERM on the CE nodes. Older GCCs erroneously search the $prefix
 # used during building, and if they hit a path that gives EPERM they
