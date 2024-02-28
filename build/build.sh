@@ -2,6 +2,11 @@
 
 set -ex
 
+# The Rust frontend needs cargo now (until it can build its rust deps, at some
+# point, someday, eventually)
+. "$HOME/.cargo/env"
+command -v cargo
+
 ROOT=$(pwd)
 VERSION=$1
 LANGUAGES=c,c++,fortran,ada,objc,obj-c++
