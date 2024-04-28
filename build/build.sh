@@ -15,7 +15,12 @@ BINUTILS_GITURL=https://sourceware.org/git/binutils-gdb.git
 BINUTILS_VERSION=2.40
 BINUTILS_REVISION=$BINUTILS_VERSION
 CONFIG=""
+
+# Defaults used for nearly every builds for recent GCC.
+BOOTSTRAP_CONFIG="--disable-bootstrap"
+INSTALL_TARGET=install-strip
 MULTILIB_ENABLED="--enable-multilib"
+WITH_ABI="--with-abi=m64"
 
 if echo "${VERSION}" | grep 'embed-trunk'; then
     VERSION=embed-trunk-$(date +%Y%m%d)
@@ -101,6 +106,24 @@ elif echo "${VERSION}" | grep 'trunk'; then
     MAJOR_MINOR=13-trunk
     LANGUAGES="${LANGUAGES},go,d,rust,m2"
     CONFIG+=" --enable-libstdcxx-backtrace=yes"
+elif echo "${VERSION}" | grep 'renovated'; then
+    SUB_VERSION=$(echo "${VERSION}" | cut -d'-' -f2)
+    URL="https://github.com/jwakely/gcc"
+    BRANCH="renovated/gcc-${SUB_VERSION}"
+    MAJOR=$(echo "${SUB_VERSION}" | cut -d'.' -f1)
+    MAJOR_MINOR=renovated-$(echo "${SUB_VERSION}" | cut -d'.' -f1-2)
+    INSTALL_TARGET=install
+    LANGUAGES="objc,c,c++"
+
+    # we need to bootstrap, as recent compiler will choke on some C++ code.
+    BOOTSTRAP_CONFIG=" "
+
+    if [[ "${MAJOR}" -le 4 ]]; then
+        WITH_ABI=" "
+        MULTILIB_ENABLED=" --disable-multilib"
+    fi
+
+    MAJOR="renovated-${MAJOR}"
 else
     MAJOR=$(echo "${VERSION}" | grep -oE '^[0-9]+')
     MAJOR_MINOR=$(echo "${VERSION}" | grep -oE '^[0-9]+\.[0-9]+')
@@ -153,7 +176,6 @@ fi
 # Workaround for Ubuntu builds
 export LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
 STAGING_DIR=$(pwd)/staging
-INSTALL_TARGET=install-strip
 rm -rf "${STAGING_DIR}"
 mkdir -p "${STAGING_DIR}"
 
@@ -196,9 +218,9 @@ applyPatchesAndConfig() {
 CONFIG+=" --build=x86_64-linux-gnu"
 CONFIG+=" --host=x86_64-linux-gnu"
 CONFIG+=" --target=x86_64-linux-gnu"
-CONFIG+=" --disable-bootstrap"
+CONFIG+=" ${BOOTSTRAP_CONFIG}"
 CONFIG+=" --enable-multiarch"
-CONFIG+=" --with-abi=m64"
+CONFIG+=" ${WITH_ABI}"
 CONFIG+=" --with-multilib-list=m32,m64,mx32"
 CONFIG+=" ${MULTILIB_ENABLED}"
 CONFIG+=" --enable-clocale=gnu"
