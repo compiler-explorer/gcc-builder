@@ -137,8 +137,8 @@ else
     # See https://github.com/compiler-explorer/compiler-explorer/issues/6103
     if [[ "${MAJOR}" -ge 12 ]]; then CONFIG+=" --enable-libstdcxx-backtrace=yes"; fi
 
-    # getting ready for next release.
-    if [[ "${MAJOR}" -ge 13 ]]; then LANGUAGES=${LANGUAGES},m2; fi
+    # Languages introduced in 13
+    if [[ "${MAJOR}" -ge 13 ]]; then LANGUAGES=${LANGUAGES},rust,m2; fi
 fi
 FULLNAME=gcc-${VERSION}
 OUTPUT=${ROOT}/${FULLNAME}.tar.xz
