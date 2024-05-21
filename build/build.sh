@@ -138,7 +138,11 @@ else
     if [[ "${MAJOR}" -ge 12 ]]; then CONFIG+=" --enable-libstdcxx-backtrace=yes"; fi
 
     # Languages introduced in 13
-    if [[ "${MAJOR}" -ge 13 ]]; then LANGUAGES=${LANGUAGES},rust,m2; fi
+    if [[ "${MAJOR}" -ge 13 ]]; then LANGUAGES=${LANGUAGES},m2; fi
+
+    # Languages introduced in 14
+    if [[ "${MAJOR}" -ge 14 ]]; then LANGUAGES=${LANGUAGES},rust; fi
+
 fi
 FULLNAME=gcc-${VERSION}
 OUTPUT=${ROOT}/${FULLNAME}.tar.xz
