@@ -87,6 +87,9 @@ elif echo "${VERSION}" | grep 'gccrs-master'; then
     MAJOR_MINOR=13-trunk
     # Only rust, this is intentional.
     LANGUAGES=rust
+    # This is needed because we are using some unstable features only available from
+    # nightly compiler... or using the RUSTC_BOOTSTRAP escape hatch.
+    export RUSTC_BOOTSTRAP=1
 elif echo "${VERSION}" | grep 'cobol-master'; then
     VERSION=cobol-master-$(date +%Y%m%d)
     PATCH_VERSION=cobol-master
