@@ -22,6 +22,9 @@ INSTALL_TARGET=install-strip
 MULTILIB_ENABLED="--enable-multilib"
 WITH_ABI="--with-abi=m64"
 
+ORIG_VERSION="${VERSION}"
+VERSION=${VERSION#"assertions-"}
+
 if echo "${VERSION}" | grep 'embed-trunk'; then
     VERSION=embed-trunk-$(date +%Y%m%d)
     URL=https://github.com/ThePhD/gcc.git
@@ -102,13 +105,13 @@ elif echo "${VERSION}" | grep 'cobol-master'; then
     ## implicit dep on C++ as libgcobol uses libstdc++.
     LANGUAGES=cobol,c++
 elif echo "${VERSION}" | grep 'trunk'; then
-    VERSION=trunk-$(date +%Y%m%d)
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
     MAJOR=15
     MAJOR_MINOR=15-trunk
     LANGUAGES="${LANGUAGES},go,d,rust,m2"
     CONFIG+=" --enable-libstdcxx-backtrace=yes"
+    VERSION=trunk-$(date +%Y%m%d)
 elif echo "${VERSION}" | grep 'renovated'; then
     SUB_VERSION=$(echo "${VERSION}" | cut -d'-' -f2)
     URL="https://github.com/jwakely/gcc"
@@ -147,6 +150,14 @@ else
     if [[ "${MAJOR}" -ge 14 ]]; then LANGUAGES=${LANGUAGES},rust; fi
 
 fi
+
+## If version is prefixed by "assertions-", do the extra steps we want for the
+## assertions- builds.
+if [[ "${ORIG_VERSION}" == assertions-* ]]; then
+    VERSION="assertions-${VERSION}"
+    CONFIG+=" --enable-checking=yes,rtl,extra"
+fi
+
 FULLNAME=gcc-${VERSION}
 OUTPUT=${ROOT}/${FULLNAME}.tar.xz
 S3OUTPUT=""
