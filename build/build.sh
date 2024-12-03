@@ -105,8 +105,8 @@ elif echo "${VERSION}" | grep 'trunk'; then
     VERSION=trunk-$(date +%Y%m%d)
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
-    MAJOR=13
-    MAJOR_MINOR=13-trunk
+    MAJOR=15
+    MAJOR_MINOR=15-trunk
     LANGUAGES="${LANGUAGES},go,d,rust,m2"
     CONFIG+=" --enable-libstdcxx-backtrace=yes"
 elif echo "${VERSION}" | grep 'renovated'; then
