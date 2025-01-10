@@ -82,6 +82,14 @@ elif echo "${VERSION}" | grep 'static-analysis-trunk'; then
     MAJOR_MINOR=10-trunk
     LANGUAGES=c,c++
     PLUGINS=analyzer
+elif echo "${VERSION}" | grep 'algol68-master'; then
+    VERSION=ga68-master-$(date +%Y%m%d)
+    URL=https://forge.sourceware.org/jemarch/a68-gcc.git
+    BRANCH=a68
+    MAJOR=15
+    MAJOR_MINOR=15-trunk
+    # Only algol68, this is intentional.
+    LANGUAGES=algol68
 elif echo "${VERSION}" | grep 'gccrs-master'; then
     VERSION=gccrs-master-$(date +%Y%m%d)
     URL=https://github.com/Rust-GCC/gccrs.git
