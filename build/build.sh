@@ -69,10 +69,10 @@ elif echo "${VERSION}" | grep 'cxx-modules-trunk'; then
     LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'cxx-coroutines-trunk'; then
     VERSION=cxx-coroutines-trunk-$(date +%Y%m%d)
-    URL=git://gcc.gnu.org/git/gcc.git
-    BRANCH=devel/c++-coroutines
-    MAJOR=10
-    MAJOR_MINOR=10-trunk
+    URL=https://github.com/iains/gcc-cxx-coroutines
+    BRANCH=c++-coroutines
+    MAJOR=15
+    MAJOR_MINOR=15-trunk
     LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'static-analysis-trunk'; then
     VERSION=static-analysis-trunk-$(date +%Y%m%d)
