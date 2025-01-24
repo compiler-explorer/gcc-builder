@@ -306,7 +306,7 @@ pushd objdir
 # shellcheck disable=SC2086
 "../gcc-${VERSION}/configure" --prefix="${STAGING_DIR}" ${CONFIG}
 if echo "${BRANCH}" | grep 'master+cobol'; then
-  make "-j12"
+  make
 else
   make "-j$(nproc)"
 fi
