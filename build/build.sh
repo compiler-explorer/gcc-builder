@@ -305,11 +305,7 @@ mkdir -p objdir
 pushd objdir
 # shellcheck disable=SC2086
 "../gcc-${VERSION}/configure" --prefix="${STAGING_DIR}" ${CONFIG}
-if echo "${BRANCH}" | grep 'master+cobol'; then
-  make
-else
-  make "-j$(nproc)"
-fi
+make "-j$(nproc)"
 make ${INSTALL_TARGET}
 popd
 
