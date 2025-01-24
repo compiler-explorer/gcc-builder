@@ -23,6 +23,8 @@ RUN apt update -y -q && apt upgrade -y -q && apt upgrade -y -q && apt install -y
     texinfo \
     unzip \
     wget \
+    pkg-config \
+    autoconf \
     xz-utils && \
     cd /tmp && \
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
