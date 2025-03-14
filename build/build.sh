@@ -157,6 +157,9 @@ else
     # Languages introduced in 14
     if [[ "${MAJOR}" -ge 14 ]]; then LANGUAGES=${LANGUAGES},rust; fi
 
+    # Languages introduced in 15
+    if [[ "${MAJOR}" -ge 15 ]]; then LANGUAGES=${LANGUAGES},cobol; fi
+
 fi
 
 ## If version is prefixed by "assertions-", do the extra steps we want for the
