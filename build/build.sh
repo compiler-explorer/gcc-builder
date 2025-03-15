@@ -117,7 +117,7 @@ elif echo "${VERSION}" | grep 'trunk'; then
     BRANCH=master
     MAJOR=15
     MAJOR_MINOR=15-trunk
-    LANGUAGES="${LANGUAGES},go,d,rust,m2"
+    LANGUAGES="${LANGUAGES},go,d,rust,m2,cobol"
     CONFIG+=" --enable-libstdcxx-backtrace=yes"
     VERSION=trunk-$(date +%Y%m%d)
 elif echo "${VERSION}" | grep 'renovated'; then
