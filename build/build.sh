@@ -12,7 +12,7 @@ VERSION=$1
 LANGUAGES=c,c++,fortran,ada,objc,obj-c++
 PLUGINS=
 BINUTILS_GITURL=https://sourceware.org/git/binutils-gdb.git
-BINUTILS_VERSION=2.42
+BINUTILS_VERSION=2.44
 BINUTILS_REVISION=$BINUTILS_VERSION
 CONFIG=""
 
