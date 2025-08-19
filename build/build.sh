@@ -53,6 +53,13 @@ elif echo "${VERSION}" | grep 'contracts-nonattr'; then
     MAJOR=13
     MAJOR_MINOR=13-trunk
     LANGUAGES=c,c++
+elif echo "${VERSION}" | grep 'lambda-p2034'; then
+    VERSION=lambda-p2034-trunk-$(date +%Y%m%d)
+    URL=https://github.com/villevoutilainen/gcc.git
+    BRANCH=lambda-p2034
+    MAJOR=15
+    MAJOR_MINOR=15-trunk
+    LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'p1144-trunk'; then
     VERSION=p1144-trunk-$(date +%Y%m%d)
     URL=https://github.com/Quuxplusone/gcc.git
