@@ -292,7 +292,7 @@ else
     else
         echo "Fetching binutils ${BINUTILS_VERSION}"
         if [[ ! -e binutils-${BINUTILS_VERSION}.tar.bz2 ]]; then
-            curl -L -O https://compiler-explorer.s3.us-east-1.amazonaws.com/public/binutils-${BINUTILS_VERSION}.tar.bz2
+            curl -L -O https://sourceware.org/pub/binutils/releases/binutils-${BINUTILS_VERSION}.tar.bz2
         fi
         tar jxf binutils-${BINUTILS_VERSION}.tar.bz2
     fi
