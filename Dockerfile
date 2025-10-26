@@ -15,6 +15,7 @@ RUN apt update -y -q && apt upgrade -y -q && apt upgrade -y -q && apt install -y
     git \
     gnat-11 \
     libc6-dev-i386 \
+    libxml-dev \
     libelf-dev \
     linux-libc-dev \
     make \
