@@ -45,7 +45,7 @@ applyPatches() {
     fi
 }
 
-applyPatches gcc-1.27 gcc${MAJOR_MINOR}
+applyPatches gcc-${MAJOR_MINOR} gcc${MAJOR_MINOR}
 applyPatches src-g++ g++${MAJOR_MINOR}
 
 pushd gcc-${MAJOR_MINOR}
@@ -63,14 +63,14 @@ mkdir g++
 
 pushd g++
 ln -s ../src-g++/* .
-ln -s ../gcc-1.27/*.[chy] . || true
-ln -s ../gcc-1.27/*.def . || true
-ln -s ../gcc-1.27/*.md . || true
-ln -s ../gcc-1.27/move-if-change . || true
-ln -s ../gcc-1.27/config-i386v.h config.h || true
-ln -s ../gcc-1.27/tm-i386v.h tm.h || true
-ln -s ../gcc-1.27/i386.md md || true
-ln -s ../gcc-1.27/output-i386.c aux-output.c || true
+ln -s ../gcc-${MAJOR_MINOR}/*.[chy] . || true
+ln -s ../gcc-${MAJOR_MINOR}/*.def . || true
+ln -s ../gcc-${MAJOR_MINOR}/*.md . || true
+ln -s ../gcc-${MAJOR_MINOR}/move-if-change . || true
+ln -s ../gcc-${MAJOR_MINOR}/config-i386v.h config.h || true
+ln -s ../gcc-${MAJOR_MINOR}/tm-i386v.h tm.h || true
+ln -s ../gcc-${MAJOR_MINOR}/i386.md md || true
+ln -s ../gcc-${MAJOR_MINOR}/output-i386.c aux-output.c || true
 popd
 
 pushd g++
