@@ -119,6 +119,13 @@ elif echo "${VERSION}" | grep 'cobol-master'; then
     MULTILIB_ENABLED=" --disable-multilib"
     ## implicit dep on C++ as libgcobol uses libstdc++.
     LANGUAGES=cobol,c++
+elif echo "${VERSION}" | grep 'reflection-trunk'; then
+    VERSION=reflection-trunk-$(date +%Y%m%d)
+    URL=https://forge.sourceware.org/marek/gcc.git
+    BRANCH="reflection"
+    MAJOR=16
+    MAJOR_MINOR=16-trunk
+    LANGUAGES=c++
 elif echo "${VERSION}" | grep 'trunk'; then
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
