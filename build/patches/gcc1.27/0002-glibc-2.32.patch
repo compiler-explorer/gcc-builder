@@ -1,0 +1,97 @@
+diff --git a/Makefile b/Makefile
+index 5946b4c..40335ed 100644
+--- a/Makefile
++++ b/Makefile
+@@ -19,8 +19,8 @@
+ #and this notice must be preserved on all copies.
+ 
+ 
+-CCLIBFLAGS = -m32
+-CFLAGS = -g -m32
++CCLIBFLAGS = -m32 -std=c89
++CFLAGS = -g -m32 -std=c89
+ CC = cc
+ # OLDCC should not be the GNU C compiler.
+ OLDCC = cc
+diff --git a/cccp.c b/cccp.c
+index c64f339..03ea046 100644
+--- a/cccp.c
++++ b/cccp.c
+@@ -125,6 +125,8 @@ typedef unsigned char U_CHAR;
+ #undef bzero
+ #undef bcmp
+ 
++#define _GNU_SOURCE
++
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <ctype.h>
+@@ -5011,10 +5013,7 @@ perror_with_name (name)
+      char *name;
+ {
+   fprintf (stderr, "%s: ", progname);
+-  if (errno < sys_nerr)
+-    fprintf (stderr, "%s for `%s'\n", sys_errlist[errno], name);
+-  else
+-    fprintf (stderr, "undocumented error for `%s'\n", name);
++  fprintf (stderr, "%s for `%s'\n", strerror (errno), name);
+ }
+ 
+ void
+diff --git a/gcc.c b/gcc.c
+index d987f31..2e53cb3 100644
+--- a/gcc.c
++++ b/gcc.c
+@@ -1220,10 +1220,7 @@ pfatal_with_name (name)
+ {
+   char *s;
+ 
+-  if (errno < sys_nerr)
+-    s = concat ("", sys_errlist[errno], " for %s");
+-  else
+-    s = "cannot open %s";
++  s = concat ("", strerror (errno), " for %s");
+   fatal (s, name);
+ }
+ 
+@@ -1232,9 +1229,6 @@ perror_with_name (name)
+ {
+   char *s;
+ 
+-  if (errno < sys_nerr)
+-    s = concat ("", sys_errlist[errno], " for %s");
+-  else
+-    s = "cannot open %s";
++  s = concat ("", strerror (errno), " for %s");
+   error (s, name);
+ }
+diff --git a/output.h b/output.h
+index d144ff9..e0e5d12 100644
+--- a/output.h
++++ b/output.h
+@@ -21,4 +21,4 @@ void output_asm_insn();
+ 
+ /* When outputting assembler code, indicates which alternative
+    of the constraints was actually satisfied.  */
+-int which_alternative;
++extern int which_alternative;
+diff --git a/toplev.c b/toplev.c
+index f157d0b..cab8150 100644
+--- a/toplev.c
++++ b/toplev.c
+@@ -74,13 +74,13 @@ int target_flags;
+ /* Name of current original source file (what was input to cpp).
+    This comes from each #-command in the actual input.  */
+ 
+-char *input_filename;
++extern char *input_filename;
+ 
+ /* Name of top-level original source file (what was input to cpp).
+    This comes from the #-command at the beginning of the actual input.
+    If there isn't any there, then this is the cc1 input file name.  */
+ 
+-char *main_input_filename;
++extern char *main_input_filename;
+ 
+ /* Current line number in real source file.  */
+ 
