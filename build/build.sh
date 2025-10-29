@@ -129,10 +129,9 @@ elif echo "${VERSION}" | grep 'reflection-trunk'; then
 elif echo "${VERSION}" | grep 'trunk'; then
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
-    MAJOR=15
+    MAJOR=16
     MAJOR_MINOR=15-trunk
     LANGUAGES="${LANGUAGES},go,d,rust,m2,cobol"
-    CONFIG+=" --enable-libstdcxx-backtrace=yes"
     VERSION=trunk-$(date +%Y%m%d)
 elif echo "${VERSION}" | grep 'renovated'; then
     SUB_VERSION=$(echo "${VERSION}" | cut -d'-' -f2)
