@@ -1,0 +1,30 @@
+diff --git a/Makefile b/Makefile
+index e584e89..b21c779 100644
+--- a/Makefile
++++ b/Makefile
+@@ -79,7 +79,7 @@ OBJS = toplev.o version.o parse.tab.o tree.o print-tree.o \
+ STAGESTUFF = *.o insn-flags.h insn-config.h insn-codes.h \
+  insn-output.c insn-recog.c insn-emit.c insn-extract.c insn-peep.c \
+  genemit genoutput genrecog genextract genflags gencodes genconfig genpeep \
+- c++ cpp+ cccp g++ ld++
++ c++ cpp+ cccp g++
+
+ # Members of gnulib.
+ LIBFUNCS = _eprintf _varargs _builtin_new _builtin_New _builtin_del \
+@@ -99,7 +99,7 @@ CONFIG_H =
+ RTL_H = rtl.h rtl.def machmode.def
+ TREE_H = tree.h tree.def machmode.def
+
+-all: g++ c++ cpp+ gnulib+ crt0+.o crt1+.o ld++ # collect
++all: g++ c++ cpp+ gnulib+ crt0+.o crt1+.o # collect
+
+ doc: cpp.info internals
+
+@@ -375,7 +375,6 @@ install: all
+ 	if [ -f /usr/bin/ranlib ] ; then  ranlib $(libdir)/gcc-gnulib+ ;fi
+ 	install cpp+ $(libdir)/gcc-cpp+
+ 	install g++ $(bindir)
+-	-install ld++ $(libdir)/gcc-ld++
+ 	-install crt0+.o $(startdir)/crt0+.o
+ 	-install crt1+.o $(startdir)/crt1+.o
+
