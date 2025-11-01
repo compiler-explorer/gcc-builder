@@ -126,6 +126,20 @@ elif echo "${VERSION}" | grep 'reflection-trunk'; then
     MAJOR=16
     MAJOR_MINOR=16-trunk
     LANGUAGES=c++
+elif echo "${VERSION}" | grep 'contracts-base-trunk'; then
+    VERSION=contracts-base-trunk-$(date +%Y%m%d)
+    URL=https://github.com/iains/gcc-git.git
+    BRANCH="C++26-contracts-base"
+    MAJOR=16
+    MAJOR_MINOR=16-trunk
+    LANGUAGES=c++
+elif echo "${VERSION}" | grep 'contracts-GNUext-trunk'; then
+    VERSION=contracts-GNUext-trunk-$(date +%Y%m%d)
+    URL=https://github.com/iains/gcc-git.git
+    BRANCH="C++26-contracts-GNU-extensions"
+    MAJOR=16
+    MAJOR_MINOR=16-trunk
+    LANGUAGES=c++
 elif echo "${VERSION}" | grep 'trunk'; then
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
