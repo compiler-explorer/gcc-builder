@@ -1,0 +1,496 @@
+diff --git a/Makefile b/Makefile
+index 0fc55e8..f59cb3d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -18,8 +18,9 @@
+ #can know your rights and responsibilities.  It should be in a
+ #file named COPYING.  Among other things, the copyright notice
+ #and this notice must be preserved on all copies.
+-PROFILE =
+-CFLAGS = -g -O -DSOS $(PROFILE)
++PROFILE = -std=c89 -m32
++CCLIBFLAGS = -std=c89 -m32
++CFLAGS = -g -DSOS $(PROFILE)
+ # CFLAGS = -S
+ CC = gcc
+ # OLDCC should not be the GNU C compiler.
+@@ -28,9 +29,10 @@ BISON = bison -v -d
+ AR = ar
+ SHELL = /bin/sh
+ 
+-bindir = /usr/local/bin
+-libdir = /usr/local/lib
+-startdir = /usr/local/lib
++prefix = /usr/local
++bindir = $(prefix)/bin
++libdir = $(prefix)/lib
++startdir = $(prefix)/lib
+ 
+ # These are what you would need on HPUX:
+ # CFLAGS = -Wc,-Ns2000 -Wc,-Ne700
+@@ -135,7 +137,7 @@ crt0+.o: crt0.c config.h
+ #	uncomment the next line for Sequent Balance systems
+ #	$(CC) -D"CRT0_DUMMIES=" -DDOT_GLOBAL_START -g -c crt0.c
+ #	uncomment the next line for Sun 2/3/4 systems
+-	$(CC) -Um68k -g -c crt0.c
++	$(CC) $(CCLIBFLAGS) -Um68k -g -c crt0.c
+ 	mv crt0.o crt0+.o
+ 
+ crt1+.o: crt1.c config.h
+@@ -143,7 +145,7 @@ crt1+.o: crt1.c config.h
+ 	mv crt1.o crt1+.o
+ 
+ c++: $(OBJS) $(OBSTACK1)
+-	$(CC) -o c++ $(PROFILE) $(OBJS) -lg $(LIBS) -lc
++	$(CC) -o c++ $(PROFILE) $(OBJS) -lg $(LIBS) -lc gnulib+
+ 
+ #Library of arithmetic subroutines
+ # Don't compile this with gcc!
+@@ -155,7 +157,7 @@ gnulib+: gnulib.c
+ 	do \
+ 	  echo $${name}; \
+ 	  rm -f $${name}.c; \
+-	  ln ../gnulib.c $${name}.c; \
++	  ln $$(readlink -f ../gnulib.c) $${name}.c; \
+ 	  $(OLDCC) $(CCLIBFLAGS) -O -I.. -c -DL$${name} $${name}.c; \
+ 	  $(AR) qc gnulib+ $${name}.o; \
+ 	done
+@@ -366,6 +368,8 @@ realclean: clean
+ 
+ # Copy the files into directories where they will be run.
+ install: all
++	mkdir -p $(bindir)
++	mkdir -p $(libdir)
+ 	install c++ $(libdir)/gcc-c++
+ 	install -c -m 755 gnulib+ $(libdir)/gcc-gnulib+
+ 	if [ -f /usr/bin/ranlib ] ; then  ranlib $(libdir)/gcc-gnulib+ ;fi
+diff --git a/class.c b/class.c
+index 1d824dd..0325665 100644
+--- a/class.c
++++ b/class.c
+@@ -253,7 +253,7 @@ maybe_change_base_vindex (type, field, limit)
+ 	    }
+ 	}
+     }
+-  DECL_VINDEX (field) = DECL_VINDEX (vindex_field);
++  SET_DECL_VINDEX (field, DECL_VINDEX (vindex_field));
+   return 0;
+ }
+ 
+diff --git a/convert.c b/convert.c
+index 1a8714a..0bbd371 100644
+--- a/convert.c
++++ b/convert.c
+@@ -132,7 +132,7 @@ convert_to_pointer (type, expr)
+ /* We are passing something to a function which requires a reference.
+    The type we are interested in is in TYPE. The initial
+    value we have to begin with is in ARG.  */
+-static tree
++tree
+ build_up_reference (type, arg)
+      tree type, arg;
+ {
+diff --git a/dbxout.c b/dbxout.c
+index fc15ac7..726ec27 100644
+--- a/dbxout.c
++++ b/dbxout.c
+@@ -1265,7 +1265,7 @@ dbxout_block (stmt, depth, args)
+ 	  if (depth > 0)
+ 	    {
+ 	      blocknum = next_block_number++;
+-	      fprintf (asmfile, ".stabn %d,0,0,LBB%d\n", N_LBRAC, blocknum);
++	      fprintf (asmfile, ".stabn %d,0,0,.LBB%d\n", N_LBRAC, blocknum);
+ 	    }
+ 
+ 	  /* Output the interior of the block.  */
+@@ -1273,7 +1273,7 @@ dbxout_block (stmt, depth, args)
+ 
+ 	  /* Refer to the marker for the end of the block.  */
+ 	  if (depth > 0)
+-	    fprintf (asmfile, ".stabn %d,0,0,LBE%d\n", N_RBRAC, blocknum);
++	    fprintf (asmfile, ".stabn %d,0,0,.LBE%d\n", N_RBRAC, blocknum);
+ 	}
+       stmt = TREE_CHAIN (stmt);
+     }
+diff --git a/decl.c b/decl.c
+index c6d4b50..b7aed38 100644
+--- a/decl.c
++++ b/decl.c
+@@ -27,6 +27,7 @@ and this notice must be preserved on all copies.  */
+ /* ??? not all decl nodes are given the most useful possible
+    line numbers.  For example, the CONST_DECLs for enum values.  */
+ 
++#include <stdio.h>
+ #include "config.h"
+ #include "tree.h"
+ #include "flags.h"
+@@ -60,7 +61,6 @@ static tree lookup_name_current_level ();
+ static char *redeclaration_error_message ();
+ static int parmlist_is_exprlist ();
+ static int parmlist_is_random ();
+-static tree finish_table ();
+ 
+ /* a node which has tree code ERROR_MARK, and whose type is itself.
+    All erroneous expressions are replaced with this node.  All functions
+@@ -284,13 +284,13 @@ int flag_labels_ok;
+ /* Nonzero for -finline-functions: ok to inline functions that look like
+    good inline candidates.  */
+ 
+-int flag_inline_functions;
++extern int flag_inline_functions;
+ 
+ /* Nonzero for -fkeep-inline-functions: even if we make a function
+    go inline everywhere, keep its defintion around for debugging
+    purposes.  */
+ 
+-int flag_keep_inline_functions;
++extern int flag_keep_inline_functions;
+ 
+ /* Nonzero for -fall-virtual: make every member function (except
+    constructors) lay down in the virtual function table.  Calls
+@@ -805,6 +805,8 @@ finish_file ()
+      about source for LINENO-1 lines.  */
+   lineno -= 1;
+ 
++  extern FILE* asm_out_file;
++  fprintf(asm_out_file, ".section .fini_array, \"aw\"\n.align 4\n.long %s\n.text\n", buf);
+   fnname = get_identifier (buf);
+   start_function (void_list, build_nt (CALL_EXPR, fnname, void_list), 0);
+   store_parm_decls ();
+@@ -837,6 +839,7 @@ mess_up:
+   /* Must do this while we think we are at the top level.  */
+   vars = nreverse (global_aggregates);
+   buf[9] = 'I';
++  fprintf(asm_out_file, ".section .init_array, \"aw\"\n.align 4\n.long %s\n.text\n", buf);
+   fnname = get_identifier (buf);
+   start_function (void_list, build_nt (CALL_EXPR, fnname, void_list), 0);
+   store_parm_decls ();
+diff --git a/expr.c b/expr.c
+index 3af5475..6ed6f0d 100644
+--- a/expr.c
++++ b/expr.c
+@@ -3799,7 +3799,7 @@ expand_call (exp, target, ignore, modifier)
+       INIT_CUMULATIVE_ARGS (args_so_far, funtype);
+       tem = FUNCTION_ARG (args_so_far, Pmode,
+ 			  build_pointer_type (TREE_TYPE (funtype)), 1);
+-      if (GET_CODE (tem) == MEM)
++      if (tem != 0 && GET_CODE (tem) == MEM)
+ 	{
+ 	  actparms = tree_cons (error_mark_node,
+ 				build (SAVE_EXPR,
+diff --git a/gcc.c b/gcc.c
+index feba8c9..205b815 100644
+--- a/gcc.c
++++ b/gcc.c
+@@ -117,6 +117,7 @@ position among the other output files.
+ #include <sys/types.h>
+ #include <signal.h>
+ #include <sys/file.h>
++#include <errno.h>
+ #include "config.h"
+ #include "obstack.h"
+ 
+@@ -205,40 +206,52 @@ struct compiler compilers[] =
+         -undef -D__GNU__ -D__GNUG__ %{ansi:-T -$ -D__STRICT_ANSI__} %{!ansi:%p}\
+         %c %{O:-D__OPTIMIZE__} %{traditional} %{pedantic}\
+         %{Wcomment} %{Wtrigraphs} %{Wall} %C\
+-        %i %{!M*:%{!E:%g.cpp}}%{E:%{o*}}%{M*:%{o*}}\n\
+-    %{!M*:%{!E:c++ %g.cpp %{!Q:-quiet} -dumpbase %i %{Y*} %{d*} %{m*} %{f*}\
++        %i %{!M*:%{!E:%g.cpppp}}%{E:%{o*}}%{M*:%{o*}}\n\
++    %{!M*:%{!E:c++ %g.cpppp %{!Q:-quiet} -dumpbase %i %{Y*} %{d*} %{m*} %{f*}\
+ 		   %{g} %{O} %{W*} %{w} %{pedantic} %{ansi} %{traditional}\
+ 		   %{v:-version} %{gg:-symout %g.sym} %{g0:-G0} %{gg0:-symout0 %g.sym} %{pg:-p} %{p}\
+ 		   %{S:%{o*}%{!o*:-o %b.s}}%{!S:-o %g.s}\n\
+-	      %{!S:as %{R} %{j} %{J} %{h} %{d2} %a %{gg:-G %g.sym}\
++	      %{!S:as --32 %{R} %{j} %{J} %{h} %{d2} %a %{gg:-G %g.sym}\
+ 		      %g.s %{c:%{o*}%{!o*:-o %w%b.o}}%{!c:-o %d%w%b.o}\n }}}"},
+   {".C",
+    "echo use .cc filename extension!\n\
+     cpp+ %{nostdinc} %{C} %{v} %{D*} %{U*} %{I*} %{M*} %{T} \
+         -undef -D__GNU__ -D__GNUG__ %{ansi:-T -D__STRICT_ANSI__} %{!ansi:%p}\
+         %c %{O:-D__OPTIMIZE__} %{traditional} %{pedantic} %{Wcomment} %{Wall}\
+-        %i %{!M*:%{!E:%g.cpp}}%{E:%{o*}}%{M*:%{o*}}\n\
+-    %{!M*:%{!E:c++ %g.cpp %{!Q:-quiet} -dumpbase %i %{Y*} %{d*} %{m*} %{f*}\
++        %i %{!M*:%{!E:%g.cpppp}}%{E:%{o*}}%{M*:%{o*}}\n\
++    %{!M*:%{!E:c++ %g.cpppp %{!Q:-quiet} -dumpbase %i %{Y*} %{d*} %{m*} %{f*}\
+ 		   %{W*} %{w} %{pedantic} %{ansi}\
+ 		   %{O:-opt}%{!O:-noreg}\
+ 		   %{v:-version} %{g:-G}%{gg:-symout %g.sym} %{g0:-G0}%{gg0:-symout0 %g.sym} %{pg:-p} %{p}\
+ 		   %{S:%{o*}%{!o*:-o %b.s}}%{!S:-o %g.s}\n\
+-	      %{!S:as %{R} %{j} %{J} %{h} %{d2} %a %{gg:-G %g.sym}\
++	      %{!S:as --32 %{R} %{j} %{J} %{h} %{d2} %a %{gg:-G %g.sym}\
+ 		      %g.s %{c:%{o*}%{!o*:-o %w%b.o}}%{!c:-o %d%w%b.o}\n }}}"},
+   {".cc",
+    "cpp+ %{nostdinc} %{C} %{v} %{D*} %{U*} %{I*} %{M*} %{T} \
+         -undef -D__GNU__ -D__GNUG__ %{ansi:-T -D__STRICT_ANSI__} %{!ansi:%p}\
+         %c %{O:-D__OPTIMIZE__} %{traditional} %{pedantic} %{Wcomment} %{Wall}\
+-        %i %{!M*:%{!E:%g.cpp}}%{E:%{o*}}%{M*:%{o*}}\n\
+-    %{!M*:%{!E:c++ %g.cpp %{!Q:-quiet} -dumpbase %i %{Y*} %{d*} %{m*} %{f*}\
++        %i %{!M*:%{!E:%g.cpppp}}%{E:%{o*}}%{M*:%{o*}}\n\
++    %{!M*:%{!E:c++ %g.cpppp %{!Q:-quiet} -dumpbase %i %{Y*} %{d*} %{m*} %{f*}\
+ 		   %{W*} %{w} %{pedantic} %{ansi}\
+ 		   %{O:-opt}%{!O:-noreg}\
+ 		   %{v:-version} %{g:-G}%{gg:-symout %g.sym} %{g0:-G0}%{gg0:-symout0 %g.sym} %{pg:-p} %{p}\
+ 		   %{S:%{o*}%{!o*:-o %b.s}}%{!S:-o %g.s}\n\
+-	      %{!S:as %{R} %{j} %{J} %{h} %{d2} %a %{gg:-G %g.sym}\
++	      %{!S:as --32 %{R} %{j} %{J} %{h} %{d2} %a %{gg:-G %g.sym}\
++		      %g.s %{c:%{o*}%{!o*:-o %w%b.o}}%{!c:-o %d%w%b.o}\n }}}"},
++  {".cpp",
++   "cpp+ %{nostdinc} %{C} %{v} %{D*} %{U*} %{I*} %{M*} %{T} \
++        -undef -D__GNU__ -D__GNUG__ %{ansi:-T -D__STRICT_ANSI__} %{!ansi:%p}\
++        %c %{O:-D__OPTIMIZE__} %{traditional} %{pedantic} %{Wcomment} %{Wall}\
++        %i %{!M*:%{!E:%g.cpppp}}%{E:%{o*}}%{M*:%{o*}}\n\
++    %{!M*:%{!E:c++ %g.cpppp %{!Q:-quiet} -dumpbase %i %{Y*} %{d*} %{m*} %{f*}\
++		   %{W*} %{w} %{pedantic} %{ansi}\
++		   %{O:-opt}%{!O:-noreg}\
++		   %{v:-version} %{g:-G}%{gg:-symout %g.sym} %{g0:-G0}%{gg0:-symout0 %g.sym} %{pg:-p} %{p}\
++		   %{S:%{o*}%{!o*:-o %b.s}}%{!S:-o %g.s}\n\
++	      %{!S:as --32 %{R} %{j} %{J} %{h} %{d2} %a %{gg:-G %g.sym}\
+ 		      %g.s %{c:%{o*}%{!o*:-o %w%b.o}}%{!c:-o %d%w%b.o}\n }}}"},
+   {".s",
+-   "%{!S:as %{R} %{j} %{J} %{h} %{d2} %a \
++   "%{!S:as --32 %{R} %{j} %{J} %{h} %{d2} %a \
+ 	    %i %{c:%{o*}%{!o*:-o %w%b.o}}%{!c:-o %d%w%b.o}\n }"},
+   /* Mark end of table */
+   {0, 0}
+@@ -252,7 +265,7 @@ char *collect_spec =
+ 		       as %g.S -o %g.O\n }}}}";
+ 
+ /* Here is the spec for running the linker, after compiling all files.  */
+-char *link_spec = "%{!c:%{!M*:%{!E:%{!S:ld %{o*} %l\
++char *link_spec = "%{!c:%{!M*:%{!E:%{!S:ld -m elf_i386 %{o*} %l\
+  %{A} %{d} %{e*} %{N} %{n} %{r} %{s} %{S} %{T*} %{t} %{u*} %{X} %{x} %{z}\
+  %{y*} %{!nostdlib:%S} \
+  %{L*} %o %g.O %{!nostdlib:-lg++ gnulib+%s %{g:-lg} %L}\n\
+@@ -260,10 +273,10 @@ char *link_spec = "%{!c:%{!M*:%{!E:%{!S:ld %{o*} %l\
+ #else
+ /* Here is the spec for running the linker, after compiling all files.
+    Note that ld++ find constructors and destructors for us.  */
+-char *link_spec = "%{!c:%{!M*:%{!E:%{!S:ld++ -C %{o*} %l\
++char *link_spec = "%{!c:%{!M*:%{!E:%{!S:gcc -m32 -nostdlib -no-pie %{Wl,*} %{o*} %l\
+  %{A} %{d} %{e*} %{N} %{n} %{r} %{s} %{S} %{T*} %{t} %{u*} %{X} %{x} %{z}\
+  %{y*} %{!nostdlib:%S} \
+- %{L*} %o %{!nostdlib:-lg++ gnulib+%s %{g:-lg} %L}\n }}}}";
++ %{L*} %o %{!nostdlib:gnulib+%s %{g:-lg} %L}\n }}}}";
+ #endif
+ 
+ /* Record the names of temporary files we tell compilers to write,
+@@ -384,8 +397,8 @@ char *user_exec_prefix = 0;
+ char *standard_exec_prefix = STANDARD_EXEC_PREFIX;
+ char *standard_exec_prefix_1 = "/usr/lib/gcc-";
+ 
+-char *standard_startfile_prefix = "/lib/";
+-char *standard_startfile_prefix_1 = "/usr/local/lib/";
++char *standard_startfile_prefix = "/lib32/";
++char *standard_startfile_prefix_1 = "/usr/lib32/";
+ 
+ /* Clear out the vector of arguments (after a command is executed).  */
+ 
+@@ -1255,27 +1268,17 @@ save_string (s, len)
+ pfatal_with_name (name)
+      char *name;
+ {
+-  extern int errno, sys_nerr;
+-  extern char *sys_errlist[];
+   char *s;
+ 
+-  if (errno < sys_nerr)
+-    s = concat ("", sys_errlist[errno], " for %s");
+-  else
+-    s = "cannot open %s";
++  s = concat ("", strerror (errno), " for %s");
+   fatal (s, name);
+ }
+ 
+ perror_with_name (name)
+      char *name;
+ {
+-  extern int errno, sys_nerr;
+-  extern char *sys_errlist[];
+   char *s;
+ 
+-  if (errno < sys_nerr)
+-    s = concat ("", sys_errlist[errno], " for %s");
+-  else
+-    s = "cannot open %s";
++  s = concat ("", strerror (errno), " for %s");
+   error (s, name);
+ }
+diff --git a/ld.c b/ld.c
+index 3cd055b..fec142a 100644
+--- a/ld.c
++++ b/ld.c
+@@ -109,7 +109,9 @@ software.
+ /* #define nounderscore 1 */
+ 
+ #include <a.out.h>
++#include <alloca.h>
+ #include <ar.h>
++#include <errno.h>
+ #include <stdio.h>
+ #include <sys/types.h>
+ #include <strings.h>
+@@ -138,7 +140,7 @@ software.
+ #endif vax
+ 
+ #define N_DATADDR(x) \
+-	(((x).a_magic==OMAGIC)? (N_TXTADDR(x)+(x).a_text) \
++	((N_MAGIC(x)==OMAGIC)? (N_TXTADDR(x)+(x).a_text) \
+ 	: (N_SEGSIZ(x)+((N_TXTADDR(x)+(x).a_text-1) & ~(N_SEGSIZ(x)-1))))
+ 
+ #define N_BSSADDR(x)  (N_DATADDR(x)+(x).a_data)
+@@ -602,7 +604,7 @@ It looks like a Sun 4.
+      the text size, and initialize the text size accordingly.
+      This depends on the kind of system and on the output format selected.  */
+ 
+-  outheader.a_magic = magic;
++  N_SET_MAGIC(outheader, magic);
+   text_size = sizeof (struct exec) - N_TXTOFF (outheader);
+   if (text_size < 0)
+     text_size = 0;
+@@ -1827,7 +1829,7 @@ It's a Sun 4.
+   header->a_machtype = M_SPARC;
+ #endif
+ #endif
+-  header->a_magic = OMAGIC;
++  N_SET_MAGIC(*header, OMAGIC);
+   header->a_text = this_text_size;
+   header->a_data = this_data_size;
+   header->a_bss = 0;
+@@ -2411,7 +2413,7 @@ void modify_location (), perform_relocation (), copy_text (), copy_data ();
+ void
+ write_header ()
+ {
+-  outheader.a_magic = magic;
++  N_SET_MAGIC(outheader, magic);
+ #ifdef sun
+ #if TARGET == SUN4
+   outheader.a_machtype = M_SPARC;
+@@ -3386,14 +3388,9 @@ fatal_with_file (string, entry)
+ perror_name (name)
+      char *name;
+ {
+-  extern int errno, sys_nerr;
+-  extern char *sys_errlist[];
+   char *s;
+ 
+-  if (errno < sys_nerr)
+-    s = concat ("", sys_errlist[errno], " for %s");
+-  else
+-    s = "cannot open %s";
++  s = concat ("", strerror (errno), " for %s");
+   fatal (s, name);
+ }
+ 
+@@ -3403,14 +3400,9 @@ perror_name (name)
+ perror_file (entry)
+      struct file_entry *entry;
+ {
+-  extern int errno, sys_nerr;
+-  extern char *sys_errlist[];
+   char *s;
+ 
+-  if (errno < sys_nerr)
+-    s = concat ("", sys_errlist[errno], " for ");
+-  else
+-    s = "cannot open ";
++  s = concat ("", strerror (errno), " for ");
+   fatal_with_file (s, entry);
+ }
+ 
+diff --git a/lex.c b/lex.c
+index 2f5e823..96415a6 100644
+--- a/lex.c
++++ b/lex.c
+@@ -47,18 +47,18 @@ static struct obstack inline_text_obstack;
+ static char *inline_text_firstobj;
+ 
+ #define YYEMPTY		-2
+-int	yychar;			/*  the lookahead symbol		*/
+-YYSTYPE	yylval;			/*  the semantic value of the		*/
++extern int	yychar;			/*  the lookahead symbol		*/
++extern YYSTYPE	yylval;			/*  the semantic value of the		*/
+ 				/*  lookahead symbol			*/
+ 
+-YYLTYPE yylloc;			/*  location data for the lookahead	*/
++extern YYLTYPE yylloc;			/*  location data for the lookahead	*/
+ 				/*  symbol				*/
+ 
+ /* the declaration found for the last IDENTIFIER token read in.
+    yylex must look this up to detect typedefs, which get token type TYPENAME,
+    so it is left around in case the identifier is not a typedef but is
+    used in a context which makes it a reference to a variable.  */
+-tree lastiddecl;
++extern tree lastiddecl;
+ 
+ /* C++ extensions */
+ tree ridpointers[];		/* need this up here */
+@@ -634,7 +634,7 @@ do_pending_inlines ()
+       finput = finput2;
+ #ifndef hp9000s300
+       setbuffer (finput2, t->buf, t->len);
+-      finput2->_cnt = finput2->_bufsiz - 1;
++      /* finput2->_cnt = finput2->_bufsiz - 1; */
+ #else
+       setvbuf(finput2,t->buf,_IOFBF,t->len);
+       finput2->_cnt = t->len-1;
+@@ -1274,7 +1274,7 @@ yylex ()
+ 	      pending_inlines = pending_inlines->next;
+ #ifndef hp9000s300
+ 	      setbuffer (finput2, t->buf, t->len);
+-	      finput2->_cnt = finput2->_bufsiz - 1;
++	      /* finput2->_cnt = finput2->_bufsiz - 1; */
+ #else
+       	      setvbuf(finput2,t->buf,_IOFBF,t->len);
+        	      finput2->_cnt = t->len-1;
+diff --git a/method.c b/method.c
+index d982368..06bb5b6 100644
+--- a/method.c
++++ b/method.c
+@@ -761,7 +761,7 @@ dump_unary_op (opstring, t, len)
+    then we do not put out a class prefix in front of it,
+    and we do not hide the first parameter.  */
+ 
+-static struct pending_inline *
++struct pending_inline *
+ stash_inline_prefix (cname, field)
+      tree cname, field;
+ {
+diff --git a/toplev.c b/toplev.c
+index 2724657..dcc6829 100644
+--- a/toplev.c
++++ b/toplev.c
+@@ -27,6 +27,7 @@ and this notice must be preserved on all copies.  */
+ #include "config.h"
+ #include <stdio.h>
+ #include <signal.h>
++#include <string.h>
+ 
+ #include <sys/types.h>
+ #include <sys/stat.h>
+@@ -77,12 +78,12 @@ int target_flags;
+    This comes from the #-command at the beginning of the actual input.
+    If there isn't any there, then this is the cc1 input file name.  */
+ 
+-char *input_filename;
++extern char *input_filename;
+ 
+ /* Name of top-level original source file (what was input to cpp).
+    This comes from the first #-command in the actual input.  */
+ 
+-char *main_input_filename;
++extern char *main_input_filename;
+ 
+ /* Current line number in real source file.  */
+ 
+@@ -1693,6 +1694,10 @@ main (argc, argv, envp)
+ 	  {
+ 	    asm_file_name = argv[++i];
+ 	  }
++	else if (strstr(str, "Wl,") == str)
++	  {
++	    /* ignore -Wl, */
++	  }
+ 	else
+ 	  error ("Invalid option `%s'", argv[i]);
+       }
