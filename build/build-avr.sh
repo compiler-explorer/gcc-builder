@@ -7,13 +7,19 @@ VER_LIBC=2.0.0
 VER_GCC=$1
 
 ROOT=$(pwd)
-OUTPUT=/root/avr-gcc-${VER_GCC}.tar.xz
+FULLNAME=avr-gcc-${VER_GCC}
+OUTPUT=${ROOT}/${FULLNAME}.tar.xz
 S3OUTPUT=""
-if echo $2 | grep s3://; then
+if echo "$2" | grep s3://; then
     S3OUTPUT=$2
 else
-    OUTPUT=${2-/root/avr-gcc-${VER_GCC}.tar.xz}
+    if [[ -d "${2}" ]]; then
+        OUTPUT=$2/${FULLNAME}.tar.xz
+    else
+        OUTPUT=${2-$OUTPUT}
+    fi
 fi
+echo "ce-build-output:${OUTPUT}"
 
 # Workaround for Ubuntu builds
 export LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
@@ -79,8 +85,10 @@ make ${INSTALL_TARGET}
 popd
 
 export XZ_DEFAULTS="-T 0"
-tar Jcf ${OUTPUT} --transform "s,^./,./avr-gcc-${VER_GCC}/," -C ${STAGING_DIR} .
+tar Jcf "${OUTPUT}" --transform "s,^./,./${FULLNAME}/," -C "${STAGING_DIR}" .
 
 if [[ -n "${S3OUTPUT}" ]]; then
     aws s3 cp --storage-class REDUCED_REDUNDANCY "${OUTPUT}" "${S3OUTPUT}"
 fi
+
+echo "ce-build-status:OK"

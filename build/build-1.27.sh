@@ -9,13 +9,19 @@ if [[ "$VERSION" != "1.27" ]]; then
     exit 1
 fi
 
-OUTPUT=/root/gcc-${VERSION}.tar.xz
+FULLNAME=gcc-${VERSION}
+OUTPUT=${ROOT}/${FULLNAME}.tar.xz
 S3OUTPUT=""
-if echo $2 | grep s3://; then
+if echo "$2" | grep s3://; then
     S3OUTPUT=$2
 else
-    OUTPUT=${2-/root/gcc-${VERSION}.tar.xz}
+    if [[ -d "${2}" ]]; then
+        OUTPUT=$2/${FULLNAME}.tar.xz
+    else
+        OUTPUT=${2-$OUTPUT}
+    fi
 fi
+echo "ce-build-output:${OUTPUT}"
 
 STAGING_DIR=/opt/compiler-explorer/gcc-${VERSION}
 
@@ -90,8 +96,10 @@ make -j$(nproc) install
 popd
 
 export XZ_DEFAULTS="-T 0"
-tar Jcf ${OUTPUT} --transform "s,^./,./gcc-${VERSION}/," -C ${STAGING_DIR} .
+tar Jcf "${OUTPUT}" --transform "s,^./,./${FULLNAME}/," -C "${STAGING_DIR}" .
 
 if [[ -n "${S3OUTPUT}" ]]; then
     aws s3 cp --storage-class REDUCED_REDUNDANCY "${OUTPUT}" "${S3OUTPUT}"
 fi
+
+echo "ce-build-status:OK"

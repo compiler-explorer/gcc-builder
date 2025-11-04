@@ -9,13 +9,19 @@ MAJOR_MINOR=$(echo ${VERSION} | grep -oE '^[0-9]+\.[0-9]+')
 URL=https://github.com/MaxKellermann/gcc.git
 BRANCH=ce-${VERSION}
 
-OUTPUT=/root/gcc-ce-${VERSION}.tar.xz
+FULLNAME=gcc-ce-${VERSION}
+OUTPUT=${ROOT}/${FULLNAME}.tar.xz
 S3OUTPUT=""
-if echo $2 | grep s3://; then
+if echo "$2" | grep s3://; then
     S3OUTPUT=$2
 else
-    OUTPUT=${2-/root/gcc-${VERSION}.tar.xz}
+    if [[ -d "${2}" ]]; then
+        OUTPUT=$2/${FULLNAME}.tar.xz
+    else
+        OUTPUT=${2-$OUTPUT}
+    fi
 fi
+echo "ce-build-output:${OUTPUT}"
 
 # Workaround for Ubuntu builds
 export LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
@@ -41,8 +47,10 @@ cd ${BUILD_DIR}
 bash ${SOURCE_DIR}/build.sh --prefix=${STAGING_DIR} -j $(nproc)
 
 export XZ_DEFAULTS="-T 0"
-tar Jcf ${OUTPUT} --transform "s,^./,./gcc-ce-${VERSION}/," -C ${STAGING_DIR} .
+tar Jcf "${OUTPUT}" --transform "s,^./,./${FULLNAME}/," -C "${STAGING_DIR}" .
 
 if [[ -n "${S3OUTPUT}" ]]; then
     aws s3 cp --storage-class REDUCED_REDUNDANCY "${OUTPUT}" "${S3OUTPUT}"
 fi
+
+echo "ce-build-status:OK"
