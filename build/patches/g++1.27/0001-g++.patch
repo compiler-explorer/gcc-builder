@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 0fc55e8..f59cb3d 100644
+index 0fc55e8..89efd77 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -18,8 +18,9 @@
@@ -28,7 +28,7 @@ index 0fc55e8..f59cb3d 100644
  
  # These are what you would need on HPUX:
  # CFLAGS = -Wc,-Ns2000 -Wc,-Ne700
-@@ -135,7 +137,7 @@ crt0+.o: crt0.c config.h
+@@ -135,15 +137,15 @@ crt0+.o: crt0.c config.h
  #	uncomment the next line for Sequent Balance systems
  #	$(CC) -D"CRT0_DUMMIES=" -DDOT_GLOBAL_START -g -c crt0.c
  #	uncomment the next line for Sun 2/3/4 systems
@@ -37,11 +37,12 @@ index 0fc55e8..f59cb3d 100644
  	mv crt0.o crt0+.o
  
  crt1+.o: crt1.c config.h
-@@ -143,7 +145,7 @@ crt1+.o: crt1.c config.h
+ 	$(CC) -Um68k -g -c crt1.c
  	mv crt1.o crt1+.o
  
- c++: $(OBJS) $(OBSTACK1)
+-c++: $(OBJS) $(OBSTACK1)
 -	$(CC) -o c++ $(PROFILE) $(OBJS) -lg $(LIBS) -lc
++c++: gnulib+ $(OBJS) $(OBSTACK1)
 +	$(CC) -o c++ $(PROFILE) $(OBJS) -lg $(LIBS) -lc gnulib+
  
  #Library of arithmetic subroutines
