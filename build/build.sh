@@ -140,6 +140,13 @@ elif echo "${VERSION}" | grep 'contracts-GNUext-trunk'; then
     MAJOR=16
     MAJOR_MINOR=16-trunk
     LANGUAGES=c++
+elif echo "${VERSION}" | grep 'thomas-healy-trunk'; then
+    VERSION=thomas-healy-$(date +%Y%m%d)
+    URL=https://github.com/healytpk/gcc-thomas-healy.git
+    BRANCH=trunk
+    MAJOR=16
+    MAJOR_MINOR=16-trunk
+    LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'trunk'; then
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
@@ -155,13 +162,6 @@ elif echo "${VERSION}" | grep 'renovated'; then
     MAJOR_MINOR=renovated-$(echo "${SUB_VERSION}" | cut -d'.' -f1-2)
     INSTALL_TARGET=install
     LANGUAGES="objc,c,c++"
-elif echo "${VERSION}" | grep 'gcc-thomas-healy'; then
-    VERSION=gcc-thomas-healy-$(date +%Y%m%d)
-    URL=https://github.com/healytpk/gcc-thomas-healy.git
-    BRANCH=trunk
-    MAJOR=16
-    MAJOR_MINOR=16-trunk
-    LANGUAGES=c,c++
 
     # we need to bootstrap, as recent compiler will choke on some C++ code.
     BOOTSTRAP_CONFIG=" "
