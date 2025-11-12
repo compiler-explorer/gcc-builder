@@ -141,7 +141,7 @@ elif echo "${VERSION}" | grep 'contracts-GNUext-trunk'; then
     MAJOR_MINOR=16-trunk
     LANGUAGES=c++
 elif echo "${VERSION}" | grep 'thomas-healy-trunk'; then
-    VERSION=thomas-healy-$(date +%Y%m%d)
+    VERSION=thomas-healy-trunk-$(date +%Y%m%d)
     URL=https://github.com/healytpk/gcc-thomas-healy.git
     BRANCH=trunk
     MAJOR=16
