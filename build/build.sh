@@ -181,9 +181,9 @@ else
     if [[ "${MAJOR}" -gt 4 ]] || [[ "${MAJOR}" -eq 4 && "${MINOR}" -ge 7 ]]; then LANGUAGES=${LANGUAGES},go; fi
     if [[ "${MAJOR}" -ge 9 ]]; then LANGUAGES=${LANGUAGES},d; fi
 
-    # Need this explicit flag for enabling <backtrace> support.
+    # Need this explicit flag for enabling <stacktrace> support in GCC 12 and 13.
     # See https://github.com/compiler-explorer/compiler-explorer/issues/6103
-    if [[ "${MAJOR}" -ge 12 ]]; then CONFIG+=" --enable-libstdcxx-backtrace=yes"; fi
+    if [[ "${MAJOR}" -eq 12 ]] || [[ "${MAJOR}" -eq 13 ]]; then CONFIG+=" --enable-libstdcxx-backtrace=yes"; fi
 
     # Languages introduced in 13
     if [[ "${MAJOR}" -ge 13 ]]; then LANGUAGES=${LANGUAGES},m2; fi
