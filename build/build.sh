@@ -151,8 +151,8 @@ elif echo "${VERSION}" | grep 'trunk'; then
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
     MAJOR=16
-    MAJOR_MINOR=15-trunk
-    LANGUAGES="${LANGUAGES},go,d,rust,m2,cobol"
+    MAJOR_MINOR=16-trunk
+    LANGUAGES="${LANGUAGES},go,d,rust,m2,cobol,algol68"
     VERSION=trunk-$(date +%Y%m%d)
 elif echo "${VERSION}" | grep 'renovated'; then
     SUB_VERSION=$(echo "${VERSION}" | cut -d'-' -f2)
@@ -193,6 +193,9 @@ else
 
     # Languages introduced in 15
     if [[ "${MAJOR}" -ge 15 ]]; then LANGUAGES=${LANGUAGES},cobol; fi
+
+    # Languages introduced in 16
+    if [[ "${MAJOR}" -ge 16 ]]; then LANGUAGES=${LANGUAGES},algol68; fi
 
 fi
 
