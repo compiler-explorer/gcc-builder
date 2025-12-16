@@ -142,7 +142,7 @@ elif echo "${VERSION}" | grep 'contracts-GNUext-trunk'; then
     LANGUAGES=c++
 elif echo "${VERSION}" | grep 'trivial-relocation-trunk'; then
     VERSION=trivial-relocation-trunk-$(date +%Y%m%d)
-    URL=git@github.com:iains/gcc-git.git
+    URL=https://github.com/iains/gcc-git.git
     BRANCH="C++2z-trivial-relocation"
     MAJOR=16
     MAJOR_MINOR=16-trunk
