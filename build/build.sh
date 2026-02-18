@@ -147,6 +147,13 @@ elif echo "${VERSION}" | grep 'thomas-healy-trunk'; then
     MAJOR=16
     MAJOR_MINOR=16-trunk
     LANGUAGES=c,c++
+elif echo "${VERSION}" | grep 'qemu-armeb-trunk'; then
+    VERSION=qemu-armeb-trunk-$(date +%Y%m%d)
+    URL=https://github.com/healytpk/gcc-qemu-armeb.git
+    BRANCH=trunk
+    MAJOR=16
+    MAJOR_MINOR=16-trunk
+    LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'trunk'; then
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
