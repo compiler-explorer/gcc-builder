@@ -1,0 +1,3 @@
+# gcc 5.x was never built with Ada on CE (not in S3 tarballs)
+# and ada/init.c uses MINSIGSTKSZ in #if which fails on glibc 2.34+
+LANGUAGES="$(echo $LANGUAGES | sed 's/,ada//')"
