@@ -342,7 +342,8 @@ if [[ "${MAJOR}" =~ ^[0-9]+$ ]] && [[ "${MAJOR}" -le 10 ]]; then
         done
         export PATH="${GNAT_WRAPPER_DIR}:${PATH}"
     else
-        echo "WARNING: CE gcc-9.4.0 gnat tools not found; Ada bootstrap may fail for gcc-${MAJOR}"
+        echo "ERROR: CE gcc-9.4.0 gnat tools not found at ${CE_HOST_GCC} (required for Ada bootstrap of gcc-${MAJOR})"
+        exit 1
     fi
 fi
 
