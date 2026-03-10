@@ -1,11 +1,1 @@
---- a/gcc/ubsan.c	2026-03-10 13:22:25.670050727 -0500
-+++ b/gcc/ubsan.c	2026-03-10 13:22:31.859543911 -0500
-@@ -1470,7 +1470,7 @@
- 
-   expanded_location xloc = expand_location (loc);
-   if (xloc.file == NULL || strncmp (xloc.file, "\1", 2) == 0
--      || xloc.file == '\0' || xloc.file[0] == '\xff'
-+      || xloc.file[0] == '\0' || xloc.file[0] == '\xff'
-       || xloc.file[1] == '\xff')
-     return false;
- 
+../ubsan-ptr-cmp.patch

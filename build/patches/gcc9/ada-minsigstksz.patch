@@ -1,16 +1,1 @@
---- a/gcc/ada/init.c	2026-03-10 13:21:47.767280667 -0500
-+++ b/gcc/ada/init.c	2026-03-10 13:21:47.792659877 -0500
-@@ -572,9 +572,13 @@
- #define HAVE_GNAT_ALTERNATE_STACK 1
- /* This must be in keeping with System.OS_Interface.Alternate_Stack_Size.
-    It must be larger than MINSIGSTKSZ and hopefully near 2 * SIGSTKSZ.  */
-+/* On glibc 2.34+, MINSIGSTKSZ is not a compile-time constant.
-+   Skip this check on those systems.  */
-+#if !defined (__GLIBC__) || !__GLIBC_PREREQ (2, 34)
- # if 16 * 1024 < MINSIGSTKSZ
- #  error "__gnat_alternate_stack too small"
- # endif
-+#endif
- char __gnat_alternate_stack[16 * 1024];
- #endif
- 
+../ada-minsigstksz.patch
