@@ -311,13 +311,13 @@ applyPatchesAndConfig "gcc${PATCH_VERSION:-$VERSION}"
 # For GCC 5-10, the system compiler (gcc-11+) and system gnat are incompatible
 # with older GCC source and Ada runtimes.  Pick a CE-installed host GCC whose
 # C++ and Ada (gnat1/gnatbind) are ABI-compatible with the version being built:
-#   MAJOR <= 8 : gcc-8.5.0  (C++ host + gnat; predates SS_Stack Ada interface)
-#   MAJOR 9-10 : gcc-9.4.0  (C++ host + gnat; no __gnat_begin_handler_v1)
+#   MAJOR <= 7 : gcc-7.5.0  (bindgen predates SS_Stack; compatible with gcc 5-7 Ada)
+#   MAJOR 8-10 : gcc-8.5.0  (bindgen has SS_Stack; no __gnat_begin_handler_v1)
 if [[ "${MAJOR}" =~ ^[0-9]+$ ]] && [[ "${MAJOR}" -le 10 ]]; then
-    if [[ "${MAJOR}" -le 8 ]]; then
-        CE_HOST_GCC=/opt/compiler-explorer/gcc-8.5.0
+    if [[ "${MAJOR}" -le 7 ]]; then
+        CE_HOST_GCC=/opt/compiler-explorer/gcc-7.5.0
     else
-        CE_HOST_GCC=/opt/compiler-explorer/gcc-9.4.0
+        CE_HOST_GCC=/opt/compiler-explorer/gcc-8.5.0
     fi
     if [[ ! -d "${CE_HOST_GCC}" ]]; then
         echo "ERROR: CE host gcc not found at ${CE_HOST_GCC} (required to build gcc ${MAJOR})"
