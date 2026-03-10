@@ -373,12 +373,7 @@ else
     fi
 
     # shellcheck disable=SC2086
-    # Force zlib debug compression so the built 'as' produces .debug_info
-    # sections that older bundled linkers (e.g. CE gcc-8.5.0's ld) can read.
-    # Without this, binutils 2.39+ may default to zstd which older ld cannot
-    # decompress, causing "file not recognized" errors when linking Ada tools.
-    ../configure --prefix="${STAGING_DIR}" ${CONFIG} ${EXTRA_CONFIG_ARGS} \
-        --enable-default-compressed-debug-sections-algorithm=zlib
+    ../configure --prefix="${STAGING_DIR}" ${CONFIG} ${EXTRA_CONFIG_ARGS}
     make "-j$(nproc)"
     make ${INSTALL_TARGET}
     popd
