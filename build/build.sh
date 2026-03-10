@@ -324,6 +324,29 @@ if [[ "${MAJOR}" =~ ^[0-9]+$ ]] && [[ "${MAJOR}" -le 8 ]]; then
     fi
 fi
 
+# For GCC 5-10, the system gnat (gnat-11 on Ubuntu 22.04) uses Ada runtime
+# interfaces introduced in GCC 11 (e.g. SS_Stack, __gnat_begin_handler_v1)
+# that older gcc Ada runtimes don't provide.  The build system looks for the
+# cross-triple-prefixed x86_64-linux-gnu-gnatbind from gnat-11, so we shadow
+# it with wrappers pointing to CE gcc-9.4.0's gnat tools, which are compatible
+# with the gcc 5-10 Ada runtimes.
+if [[ "${MAJOR}" =~ ^[0-9]+$ ]] && [[ "${MAJOR}" -le 10 ]]; then
+    CE_HOST_GCC=/opt/compiler-explorer/gcc-9.4.0
+    if [[ -d "${CE_HOST_GCC}/bin/gnatbind" ]] || [[ -f "${CE_HOST_GCC}/bin/gnatbind" ]]; then
+        echo "Wrapping system gnat with CE gcc-9.4.0 gnat tools for Ada bootstrap of gcc-${MAJOR}"
+        GNAT_WRAPPER_DIR="$(mktemp -d)"
+        for tool in gnat gnatbind gnatclean gnatfind gnatchop gnatkr gnatlink gnatls gnatmake gnatname gnatprep gnatxref; do
+            if [[ -f "${CE_HOST_GCC}/bin/${tool}" ]]; then
+                ln -sf "${CE_HOST_GCC}/bin/${tool}" "${GNAT_WRAPPER_DIR}/x86_64-linux-gnu-${tool}"
+            fi
+        done
+        export PATH="${GNAT_WRAPPER_DIR}:${PATH}"
+    else
+        echo "ERROR: CE gcc-9.4.0 gnat tools not found at ${CE_HOST_GCC} (required for Ada bootstrap of gcc-${MAJOR})"
+        exit 1
+    fi
+fi
+
 echo "Will configure with ${CONFIG}"
 
 if [[ -z "${BINUTILS_VERSION}" ]]; then
