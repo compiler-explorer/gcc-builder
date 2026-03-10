@@ -34,6 +34,13 @@ RUN apt update -y -q && apt upgrade -y -q && apt upgrade -y -q && apt install -y
 ## The Rust frontend now requires rustc to build.
 RUN curl  --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s - -y
 
+# Install CE compilers for use as host when building old GCC versions.
+# Modern g++ (11+) is too strict for gcc 5.x-8.x source (C++17 changes,
+# stricter template rules). We use CE-built gcc 9.4.0 as host for MAJOR <= 8.
+RUN git clone --depth=1 https://github.com/compiler-explorer/infra /opt/compiler-explorer/infra && \
+    cd /opt/compiler-explorer/infra && make ce && \
+    /opt/compiler-explorer/infra/bin/ce_install install 'compilers/c++/x86/gcc 9.4.0'
+
 # We build from a directory that must be at least searchable with
 # EPERM on the CE nodes. Older GCCs erroneously search the $prefix
 # used during building, and if they hit a path that gives EPERM they
