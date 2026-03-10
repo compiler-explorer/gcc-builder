@@ -1,0 +1,16 @@
+Fix __sanitizer_ipc_perm.mode size for glibc 2.31+.
+glibc 2.31 changed ipc_perm.mode from unsigned short (2 bytes) to
+unsigned int (4 bytes) on Linux x86/x86_64.  The sanitizer shadow
+struct must match or CHECK_SIZE_AND_OFFSET will fire at compile time.
+Fixed upstream in gcc 8.4.0 and gcc 9.4.0.
+--- a/libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.h
++++ b/libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.h
+@@ -231,8 +231,7 @@ extern unsigned struct_statvfs64_sz;
+ #else
+-    unsigned short mode;
+-    unsigned short __pad1;
+-    unsigned short __seq;
++    unsigned int mode;
++    unsigned short __seq;
+     unsigned short __pad2;
+ #if defined(__x86_64__) && !defined(_LP64)
