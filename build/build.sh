@@ -308,6 +308,22 @@ applyPatchesAndConfig "gcc${MAJOR}"
 applyPatchesAndConfig "gcc${MAJOR_MINOR}"
 applyPatchesAndConfig "gcc${PATCH_VERSION:-$VERSION}"
 
+# For GCC 5-8, modern g++ (11+) is too strict (C++17 changes, stricter template
+# rules). Use a CE-installed gcc 9 as the host compiler instead if available.
+if [[ "${MAJOR}" =~ ^[0-9]+$ ]] && [[ "${MAJOR}" -le 8 ]]; then
+    CE_HOST_GCC=/opt/compiler-explorer/gcc-9.4.0
+    if [[ -d "${CE_HOST_GCC}" ]]; then
+        echo "Using CE gcc-9.4.0 as host compiler for gcc-${MAJOR}"
+        export PATH="${CE_HOST_GCC}/bin:${PATH}"
+        export LD_LIBRARY_PATH="${CE_HOST_GCC}/lib64:${CE_HOST_GCC}/lib:${LD_LIBRARY_PATH:-}"
+        export CC="${CE_HOST_GCC}/bin/gcc"
+        export CXX="${CE_HOST_GCC}/bin/g++"
+    else
+        echo "ERROR: CE gcc-9.4.0 not found at ${CE_HOST_GCC} (required to build gcc ${MAJOR})"
+        exit 1
+    fi
+fi
+
 echo "Will configure with ${CONFIG}"
 
 if [[ -z "${BINUTILS_VERSION}" ]]; then
