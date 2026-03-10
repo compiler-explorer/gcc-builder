@@ -326,11 +326,26 @@ if [[ "${MAJOR}" =~ ^[0-9]+$ ]] && [[ "${MAJOR}" -le 10 ]]; then
     echo "Using CE ${CE_HOST_GCC##*/} as host for gcc-${MAJOR}"
     export PATH="${CE_HOST_GCC}/bin:${PATH}"
     export LD_LIBRARY_PATH="${CE_HOST_GCC}/lib64:${CE_HOST_GCC}/lib:${LD_LIBRARY_PATH:-}"
-    export CC="${CE_HOST_GCC}/bin/gcc"
-    export CXX="${CE_HOST_GCC}/bin/g++"
+    # Wrap CC/CXX to force -gz=zlib debug compression.  Ubuntu 24.04's
+    # system assembler defaults to zstd, but the CE-installed host gcc's
+    # bundled ld is old enough that it cannot decompress zstd debug sections,
+    # causing "file not recognized" errors when linking Ada bootstrap objects.
+    GNAT_WRAPPER_DIR="$(mktemp -d)"
+    cat > "${GNAT_WRAPPER_DIR}/host-gcc" << 'WRAPPER_EOF'
+#!/bin/bash
+exec "@@CE_HOST_GCC@@/bin/gcc" -gz=zlib "$@"
+WRAPPER_EOF
+    cat > "${GNAT_WRAPPER_DIR}/host-g++" << 'WRAPPER_EOF'
+#!/bin/bash
+exec "@@CE_HOST_GCC@@/bin/g++" -gz=zlib "$@"
+WRAPPER_EOF
+    sed -i "s|@@CE_HOST_GCC@@|${CE_HOST_GCC}|g" \
+        "${GNAT_WRAPPER_DIR}/host-gcc" "${GNAT_WRAPPER_DIR}/host-g++"
+    chmod +x "${GNAT_WRAPPER_DIR}/host-gcc" "${GNAT_WRAPPER_DIR}/host-g++"
+    export CC="${GNAT_WRAPPER_DIR}/host-gcc"
+    export CXX="${GNAT_WRAPPER_DIR}/host-g++"
     # Shadow x86_64-linux-gnu-gnat* with the host's gnat tools so the Ada
     # bootstrap uses the same gnat version as the C/C++ host above.
-    GNAT_WRAPPER_DIR="$(mktemp -d)"
     for tool in gnat gnatbind gnatclean gnatfind gnatchop gnatkr gnatlink gnatls gnatmake gnatname gnatprep gnatxref; do
         if [[ -f "${CE_HOST_GCC}/bin/${tool}" ]]; then
             ln -sf "${CE_HOST_GCC}/bin/${tool}" "${GNAT_WRAPPER_DIR}/x86_64-linux-gnu-${tool}"
