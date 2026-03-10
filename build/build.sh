@@ -319,7 +319,8 @@ if [[ "${MAJOR}" =~ ^[0-9]+$ ]] && [[ "${MAJOR}" -le 8 ]]; then
         export CC="${CE_HOST_GCC}/bin/gcc"
         export CXX="${CE_HOST_GCC}/bin/g++"
     else
-        echo "WARNING: CE gcc-9.4.0 not found at ${CE_HOST_GCC}, using system compiler"
+        echo "ERROR: CE gcc-9.4.0 not found at ${CE_HOST_GCC} (required to build gcc ${MAJOR})"
+        exit 1
     fi
 fi
 
