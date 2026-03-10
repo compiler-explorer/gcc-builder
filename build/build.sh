@@ -326,8 +326,14 @@ if [[ "${MAJOR}" =~ ^[0-9]+$ ]] && [[ "${MAJOR}" -le 10 ]]; then
     echo "Using CE ${CE_HOST_GCC##*/} as host for gcc-${MAJOR}"
     export PATH="${CE_HOST_GCC}/bin:${PATH}"
     export LD_LIBRARY_PATH="${CE_HOST_GCC}/lib64:${CE_HOST_GCC}/lib:${LD_LIBRARY_PATH:-}"
-    export CC="${CE_HOST_GCC}/bin/gcc"
-    export CXX="${CE_HOST_GCC}/bin/g++"
+    # Add -B to redirect the host linker to the staged binutils.  The
+    # in-tree gcc (xgcc) compiles Ada bootstrap objects with -gz=zlib-gabi
+    # (because the staged assembler reports that capability), but the CE
+    # host gcc's own bundled ld is binutils 2.29.1 which cannot decompress
+    # those sections when linking gnattools.  Using the staged ld (2.38)
+    # for both assembly and link keeps them consistent.
+    export CC="${CE_HOST_GCC}/bin/gcc -B${STAGING_DIR}/x86_64-linux-gnu/bin"
+    export CXX="${CE_HOST_GCC}/bin/g++ -B${STAGING_DIR}/x86_64-linux-gnu/bin"
     # Shadow x86_64-linux-gnu-gnat* with the host's gnat tools so the Ada
     # bootstrap uses the same gnat version as the C/C++ host above.
     GNAT_WRAPPER_DIR="$(mktemp -d)"
