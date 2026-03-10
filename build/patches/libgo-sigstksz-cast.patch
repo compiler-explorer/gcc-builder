@@ -1,0 +1,12 @@
+--- a/libgo/runtime/proc.c
++++ b/libgo/runtime/proc.c
+@@ -799,8 +799,8 @@ newg_from_sp_locked(G *gp, bool allocatestack, bool signalstack, byte** ret_sta
+ 		if(signalstack) {
+ 			stacksize = 32 * 1024; // OS X wants >= 8K, GNU/Linux >= 2K
+ #ifdef SIGSTKSZ
+-			if(stacksize < SIGSTKSZ)
+-				stacksize = SIGSTKSZ;
++			if(stacksize < (uintptr)(SIGSTKSZ))
++				stacksize = (uintptr)(SIGSTKSZ);
+ #endif
+ 		}
