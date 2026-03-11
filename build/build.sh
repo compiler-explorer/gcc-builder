@@ -308,37 +308,6 @@ applyPatchesAndConfig "gcc${MAJOR}"
 applyPatchesAndConfig "gcc${MAJOR_MINOR}"
 applyPatchesAndConfig "gcc${PATCH_VERSION:-$VERSION}"
 
-# For GCC 5-10, the system compiler (gcc-11+) and system gnat are incompatible
-# with older GCC source and Ada runtimes.  Pick a CE-installed host GCC whose
-# C++ and Ada (gnat1/gnatbind) are ABI-compatible with the version being built:
-#   MAJOR <= 7 : gcc-7.5.0  (bindgen predates SS_Stack; compatible with gcc 5-7 Ada)
-#   MAJOR 8-10 : gcc-8.5.0  (bindgen has SS_Stack; no __gnat_begin_handler_v1)
-if [[ "${MAJOR}" =~ ^[0-9]+$ ]] && [[ "${MAJOR}" -le 10 ]]; then
-    if [[ "${MAJOR}" -le 7 ]]; then
-        CE_HOST_GCC=/opt/compiler-explorer/gcc-7.5.0
-    else
-        CE_HOST_GCC=/opt/compiler-explorer/gcc-8.5.0
-    fi
-    if [[ ! -d "${CE_HOST_GCC}" ]]; then
-        echo "ERROR: CE host gcc not found at ${CE_HOST_GCC} (required to build gcc ${MAJOR})"
-        exit 1
-    fi
-    echo "Using CE ${CE_HOST_GCC##*/} as host for gcc-${MAJOR}"
-    export PATH="${CE_HOST_GCC}/bin:${PATH}"
-    export LD_LIBRARY_PATH="${CE_HOST_GCC}/lib64:${CE_HOST_GCC}/lib:${LD_LIBRARY_PATH:-}"
-    export CC="${CE_HOST_GCC}/bin/gcc"
-    export CXX="${CE_HOST_GCC}/bin/g++"
-    # Shadow x86_64-linux-gnu-gnat* with the host's gnat tools so the Ada
-    # bootstrap uses the same gnat version as the C/C++ host above.
-    GNAT_WRAPPER_DIR="$(mktemp -d)"
-    for tool in gnat gnatbind gnatclean gnatfind gnatchop gnatkr gnatlink gnatls gnatmake gnatname gnatprep gnatxref; do
-        if [[ -f "${CE_HOST_GCC}/bin/${tool}" ]]; then
-            ln -sf "${CE_HOST_GCC}/bin/${tool}" "${GNAT_WRAPPER_DIR}/x86_64-linux-gnu-${tool}"
-        fi
-    done
-    export PATH="${GNAT_WRAPPER_DIR}:${PATH}"
-fi
-
 echo "Will configure with ${CONFIG}"
 
 if [[ -z "${BINUTILS_VERSION}" ]]; then
