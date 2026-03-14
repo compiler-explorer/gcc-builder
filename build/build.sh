@@ -200,16 +200,10 @@ else
 fi
 
 ## If version is prefixed by "assertions-", do the extra steps we want for the
-## assertions- builds. Otherwise, explicitly use --enable-checking=release so
-## that trunk builds behave like distro GCC (Ubuntu/Debian use release checking)
-## rather than defaulting to the expensive dev checks (--enable-checking=yes,extra)
-## that GCC trunk enables by default. The dev checks significantly slow down
-## compilation without affecting code generation.
+## assertions- builds.
 if [[ "${ORIG_VERSION}" == assertions-* ]]; then
     VERSION="assertions-${VERSION}"
     CONFIG+=" --enable-checking=yes,rtl,extra"
-else
-    CONFIG+=" --enable-checking=release"
 fi
 
 FULLNAME=gcc-${VERSION}
