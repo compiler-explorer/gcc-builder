@@ -32,6 +32,13 @@ if echo "${VERSION}" | grep 'embed-trunk'; then
     MAJOR=10
     MAJOR_MINOR=10-trunk
     LANGUAGES=c,c++
+elif echo "${VERSION}" | grep 'thephd.dev'; then
+    VERSION=thephd.dev-$(date +%Y%m%d)
+    URL=https://github.com/ThePhD/gcc.git
+    BRANCH=thephd.dev
+    MAJOR=16
+    MAJOR_MINOR=16-trunk
+    LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'lock3-contracts-trunk'; then
     VERSION=lock3-contracts-trunk-$(date +%Y%m%d)
     URL=https://github.com/lock3/gcc.git
