@@ -70,6 +70,13 @@ elif echo "${VERSION}" | grep 'lambda-p2034'; then
     MAJOR=15
     MAJOR_MINOR=15-trunk
     LANGUAGES=c,c++
+elif echo "${VERSION}" | grep 'contracts-p4324'; then
+    VERSION=contracts-p4324-trunk-$(date +%Y%m%d)
+    URL=https://github.com/villevoutilainen/gcc.git
+    BRANCH=p4324
+    MAJOR=16
+    MAJOR_MINOR=16-trunk
+    LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'p1144-trunk'; then
     VERSION=p1144-trunk-$(date +%Y%m%d)
     URL=https://github.com/Quuxplusone/gcc.git
