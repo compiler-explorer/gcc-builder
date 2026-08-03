@@ -171,6 +171,13 @@ elif echo "${VERSION}" | grep 'thomas-healy-trunk'; then
     MAJOR=16
     MAJOR_MINOR=16-trunk
     LANGUAGES=c,c++
+elif echo "${VERSION}" | grep 'ilazaric-enclosing_cast'; then
+    VERSION=ilazaric-enclosing_cast-$(date +%Y%m%d)
+    URL=https://github.com/ilazaric/gcc.git
+    BRANCH=enclosing_cast
+    MAJOR=17
+    MAJOR_MINOR=17-trunk
+    LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'trunk'; then
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
