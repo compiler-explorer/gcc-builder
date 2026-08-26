@@ -125,17 +125,6 @@ elif echo "${VERSION}" | grep 'gccrs-master'; then
     # This is needed because we are using some unstable features only available from
     # nightly compiler... or using the RUSTC_BOOTSTRAP escape hatch.
     export RUSTC_BOOTSTRAP=1
-elif echo "${VERSION}" | grep 'cobol-master'; then
-    VERSION=cobol-master-$(date +%Y%m%d)
-    PATCH_VERSION=cobol-master
-    URL=https://gitlab.cobolworx.com/COBOLworx/gcc-cobol.git
-    BRANCH="master+cobol"
-    MAJOR=13
-    MAJOR_MINOR=13-trunk
-    # Currently fails to build 32-bit multilibs
-    MULTILIB_ENABLED=" --disable-multilib"
-    ## implicit dep on C++ as libgcobol uses libstdc++.
-    LANGUAGES=cobol,c++
 elif echo "${VERSION}" | grep 'contracts-base-trunk'; then
     VERSION=contracts-base-trunk-$(date +%Y%m%d)
     URL=https://github.com/iains/gcc-git.git
