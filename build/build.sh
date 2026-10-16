@@ -167,6 +167,13 @@ elif echo "${VERSION}" | grep 'ilazaric-enclosing_cast'; then
     MAJOR=17
     MAJOR_MINOR=17-trunk
     LANGUAGES=c,c++
+elif echo "${VERSION}" | grep 'expr-reflect-trunk'; then
+    VERSION=expr-reflect-trunk-$(date +%Y%m%d)
+    URL=https://github.com/yesmanchyk/gcc-mirror.git
+    BRANCH=autograd-capable
+    MAJOR=17
+    MAJOR_MINOR=17-trunk
+    LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'trunk'; then
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
