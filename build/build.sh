@@ -174,6 +174,13 @@ elif echo "${VERSION}" | grep 'expr-reflect-trunk'; then
     MAJOR=17
     MAJOR_MINOR=17-trunk
     LANGUAGES=c,c++
+elif echo "${VERSION}" | grep 'p0917-trunk'; then
+    VERSION=p0917-trunk-$(date +%Y%m%d)
+    URL=https://github.com/mattkretz/gcc.git
+    BRANCH=P0917_overloadable_conditional_operator
+    MAJOR=17
+    MAJOR_MINOR=17-trunk
+    LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'trunk'; then
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
