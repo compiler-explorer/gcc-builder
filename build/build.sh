@@ -169,8 +169,8 @@ elif echo "${VERSION}" | grep 'ilazaric-enclosing_cast'; then
     LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'expr-reflect-trunk'; then
     VERSION=expr-reflect-trunk-$(date +%Y%m%d)
-    URL=https://github.com/yesmanchyk/gcc-mirror.git
-    BRANCH=autograd-capable
+    URL=https://github.com/CppReflectionAD/gcc.git
+    BRANCH=p4395
     MAJOR=17
     MAJOR_MINOR=17-trunk
     LANGUAGES=c,c++
