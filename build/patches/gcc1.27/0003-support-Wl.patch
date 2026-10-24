@@ -1,0 +1,28 @@
+diff --git a/gcc.c b/gcc.c
+index 2e53cb3..fc2b5de 100644
+--- a/gcc.c
++++ b/gcc.c
+@@ -233,7 +233,7 @@ struct compiler compilers[] =
+ };
+ 
+ /* Here is the spec for running the linker, after compiling all files.  */
+-char *link_spec = "%{!c:%{!M*:%{!E:%{!S:ld -m elf_i386 %{o*} %l\
++char *link_spec = "%{!c:%{!M*:%{!E:%{!S:gcc -m32 -nostdlib -no-pie %{Wl,*} %{o*} %l\
+  %{A} %{d} %{e*} %{N} %{n} %{r} %{s} %{S} %{T*} %{t} %{u*} %{X} %{x} %{z}\
+  %{y*} %{!nostdlib:%S} \
+  %{L*} %o %{!nostdlib:gnulib%s %{g:-lg} %L}\n }}}}";
+diff --git a/toplev.c b/toplev.c
+index cab8150..32d85d4 100644
+--- a/toplev.c
++++ b/toplev.c
+@@ -1529,6 +1529,10 @@ main (argc, argv, envp)
+ 	  {
+ 	    asm_file_name = argv[++i];
+ 	  }
++	else if (strstr (str, "Wl,") == str)
++	  {
++	    /* ignore -Wl, */
++	  }
+ 	else
+ 	  error ("Invalid option `%s'", argv[i]);
+       }
