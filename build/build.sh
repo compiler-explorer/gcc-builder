@@ -195,6 +195,13 @@ elif echo "${VERSION}" | grep 'dascandy-subsets-trunk'; then
     MAJOR=17
     MAJOR_MINOR=17-trunk
     LANGUAGES=c,c++
+elif echo "${VERSION}" | grep 'dascandy-p3267-trunk'; then
+    VERSION=dascandy-p3267-trunk-$(date +%Y%m%d)
+    URL=https://github.com/dascandy/gcc.git
+    BRANCH=contracts-postcheck-entry
+    MAJOR=17
+    MAJOR_MINOR=17-trunk
+    LANGUAGES=c,c++
 elif echo "${VERSION}" | grep 'trunk'; then
     URL=git://gcc.gnu.org/git/gcc.git
     BRANCH=master
